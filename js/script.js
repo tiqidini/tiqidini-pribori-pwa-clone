@@ -1,3 +1,7 @@
+import { loadData } from './storage.js';
+import { updateOverdueStats, renderDeviceList, initUIHandlers } from './ui.js';
+import { initNotifications } from './notifications.js';
+
 // --- Глобальні змінні та DOM елементи ---
 let currentDevices = [];
 let currentRMFilter = 'all';
@@ -426,7 +430,70 @@ rmFilterContainer.addEventListener('click', (event) => {
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log("DOM завантажено. Завантаження даних...");
-    loadData();
+    currentDevices = loadData();
     console.log(`Завантажено ${currentDevices.length} приладів.`);
-    renderDeviceList();
+    
+    updateOverdueStats(currentDevices);
+    renderDeviceList(currentDevices, currentRMFilter);
+    initUIHandlers(currentDevices, currentRMFilter);
+    initNotifications(currentDevices);
+});
+
+// Функция для проверки является ли строка числом
+function isNumeric(str) {
+    return /^\d+$/.test(str);
+}
+
+// Функция для проверки необходимости поверки
+function checkCalibrationNeeded(device) {
+    if (!device.lastCheckDate || !device.mpi) return false;
+    
+    const lastCheck = new Date(device.lastCheckDate);
+    const nextCheck = new Date(lastCheck);
+    nextCheck.setFullYear(lastCheck.getFullYear() + device.mpi);
+    
+    return {
+        isNeeded: new Date() > nextCheck && 
+                  isNumeric(device.location) && 
+                  device.calibrationLocation && 
+                  typeof device.calibrationLocation === 'string' && 
+                  device.calibrationLocation !== '-',
+        nextCheckDate: nextCheck
+    };
+}
+
+// Функция для отображения уведомлений
+function showNotifications() {
+    const notificationContainer = document.getElementById('notification-container') || 
+        (() => {
+            const container = document.createElement('div');
+            container.id = 'notification-container';
+            document.body.insertBefore(container, document.body.firstChild);
+            return container;
+        })();
+    
+    notificationContainer.innerHTML = '';
+    
+    currentDevices.forEach(device => {
+        const calibrationCheck = checkCalibrationNeeded(device);
+        if (calibrationCheck.isNeeded) {
+            const notification = document.createElement('div');
+            notification.className = 'notification slide-in';
+            notification.innerHTML = `
+                <i class="fas fa-exclamation-triangle"></i>
+                Необхідна повірка приладу ${device.type} (${device.name})
+                в ${device.calibrationLocation}
+                <button onclick="this.parentElement.remove()" class="close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            notificationContainer.appendChild(notification);
+        }
+    });
+}
+
+// Вызываем проверку при загрузке страницы и каждый час
+document.addEventListener('DOMContentLoaded', () => {
+    showNotifications();
+    setInterval(showNotifications, 3600000); // Каждый час
 });
