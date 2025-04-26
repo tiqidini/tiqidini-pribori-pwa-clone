@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#3a86ff"/> <title>Список Приладів</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#3a86ff"/>
+    <title>Список Приладів</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="img/icon-192x192.png">
@@ -43,7 +41,7 @@
                 </svg>
                 Додати
             </button>
-             </div>
+        </div>
 
         <div class="device-count-container">
             Показано: <span id="device-count">0</span> прилад(ів)
@@ -55,81 +53,83 @@
     </main>
 
     <div id="modal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" aria-label="Закрити">&times;</button>
-            <h2 id="modal-title">Додати/Редагувати Прилад</h2>
-            <form id="device-form">
-                <input type="hidden" id="device-id">
+        <div class="modal-outer"> <div class="modal-content">
+                <button class="close-btn" aria-label="Закрити">&times;</button>
+                <h2 id="modal-title">Додати/Редагувати Прилад</h2>
+                <form id="device-form">
+                    <input type="hidden" id="device-id">
 
-                <div class="form-group">
-                    <label for="device-rm">РМ:</label>
-                    <input type="text" id="device-rm" required>
-                </div>
+                    <div class="form-group">
+                        <label for="device-rm">РМ:</label>
+                        <input type="text" id="device-rm" required>
+                    </div>
 
-                <div class="form-group">
-                    <label for="device-name">Найменування:</label>
-                    <input type="text" id="device-name" required>
-                </div>
+                    <div class="form-group">
+                        <label for="device-name">Найменування:</label>
+                        <input type="text" id="device-name" required>
+                    </div>
 
-                <div class="form-group">
-                    <label for="device-type">Тип:</label>
-                    <input type="text" id="device-type" required>
-                </div>
+                    <div class="form-group">
+                        <label for="device-type">Тип:</label>
+                        <input type="text" id="device-type" required>
+                    </div>
 
-                <div class="form-group">
-                    <label for="device-serial">Заводський номер:</label>
-                    <input type="text" id="device-serial" required>
-                </div>
+                    <div class="form-group">
+                        <label for="device-serial">Заводський номер:</label>
+                        <input type="text" id="device-serial" required>
+                    </div>
 
-                <div class="form-group">
-                    <label for="device-lastCheckDate">Дата останньої повірки:</label>
-                    <input type="date" id="device-lastCheckDate">
-                </div>
+                    <div class="form-group">
+                        <label for="device-lastCheckDate">Дата останньої повірки:</label>
+                        <input type="date" id="device-lastCheckDate">
+                    </div>
 
-                <div class="form-group">
-                    <label for="device-mpi">МПІ (роки):</label>
-                    <input type="number" id="device-mpi" min="1">
-                </div>
+                    <div class="form-group">
+                        <label for="device-mpi">МПІ (роки):</label>
+                        <input type="number" id="device-mpi" min="1">
+                    </div>
 
-                <div class="form-group">
-                    <label for="device-location">Де прилад:</label>
-                    <input type="text" id="device-location">
-                </div>
+                    <div class="form-group">
+                        <label for="device-location">Де прилад:</label>
+                        <input type="text" id="device-location">
+                    </div>
 
-                <div class="form-group">
-                    <label for="device-calibrationLocation">Місце калібрування:</label>
-                    <input type="text" id="device-calibrationLocation">
-                </div>
+                    <div class="form-group">
+                        <label for="device-povirkyLocation">Місце повірки:</label>
+                        <input type="text" id="device-povirkyLocation">
+                    </div>
 
-                 <div class="form-group">
-                    <label for="device-notes">Примітки:</label>
-                    <textarea id="device-notes" rows="3"></textarea>
-                 </div>
+                     <div class="form-group">
+                        <label for="device-notes">Примітки:</label>
+                        <textarea id="device-notes" rows="3"></textarea>
+                     </div>
 
-                <div class="form-buttons">
-                    <button type="submit" id="save-device-btn" class="button button-primary">
-                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-lg" viewBox="0 0 16 16">
-                           <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/>
-                         </svg>
-                         Зберегти
-                     </button>
-                    <button type="button" id="delete-device-btn" class="button button-danger hidden">
-                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                           <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
-                           <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
-                         </svg>
-                         Видалити
-                     </button>
-                </div>
-            </form>
+                    <div class="form-buttons">
+                        <button type="submit" id="save-device-btn" class="button button-primary">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-lg" viewBox="0 0 16 16">
+                               <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/>
+                             </svg>
+                             Зберегти
+                         </button>
+                        <button type="button" id="delete-device-btn" class="button button-danger hidden">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                               <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                               <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                             </svg>
+                             Видалити
+                         </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
-    <script src="js/data.js"></script> <script src="js/script.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/script.js"></script>
     <script>
         // Реєстрація Service Worker
         if ('serviceWorker' in navigator) {
-            const swPath = 'service-worker.js'; // Якщо SW в корені
+            const swPath = 'service-worker.js';
             navigator.serviceWorker.register(swPath)
             .then(registration => {
                 console.log('Service Worker зареєстровано:', registration.scope);
