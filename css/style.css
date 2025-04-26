@@ -1,5 +1,5 @@
-/* Підключення шрифту Lato з Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+/* Системний стек шрифтів з Calibri */
+@import url('https://fonts.googleapis.com/css2?family=Carlito&display=swap'); /* Carlito як fallback для Calibri */
 
 /* Базові змінні */
 :root {
@@ -26,19 +26,23 @@
     --type-color: #0077b6;
     --border-radius: 8px;
     --border-radius-small: 5px;
-    /* Застосування шрифту Lato */
-    --font-family-base: 'Lato', sans-serif;
+    /* Системний шрифт з Calibri */
+    --font-family-base: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
+    --font-family-fallback: 'Carlito', sans-serif; /* Fallback, якщо Calibri немає */
 }
 
 /* Загальні стилі */
 body {
-    font-family: var(--font-family-base); /* Застосовуємо Lato */
+    /* Спочатку спробуємо системний стек */
+    font-family: var(--font-family-base);
+    /* Якщо Calibri немає, браузер спробує наступні,
+       але ми також можемо додати Carlito як веб-шрифт */
+    /* Якщо ви хочете гарантовано схожий шрифт, розкоментуйте наступний рядок */
+    /* font-family: var(--font-family-fallback); */
     margin: 0;
     background-color: var(--secondary-color);
     color: var(--text-color);
-    line-height: 1.55; /* Трохи збільшив для Lato */
-    -webkit-font-smoothing: antialiased; /* Згладжування шрифтів */
-    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.5; /* Зменшив для Calibri */
 }
 
 .container {
@@ -65,7 +69,7 @@ body {
     max-width: 1200px;
     margin: 0 auto;
 }
-.app-header h1 { margin: 0; font-size: 1.3em; font-weight: 700; } /* Зробив жирнішим */
+.app-header h1 { margin: 0; font-size: 1.3em; font-weight: 500; }
 .stats-container {
     display: flex;
     align-items: center;
@@ -74,7 +78,7 @@ body {
     padding: 5px 10px;
     border-radius: var(--border-radius-small);
     font-size: 0.9em;
-    font-weight: 700; /* Зробив жирнішим */
+    font-weight: 500;
     cursor: default;
 }
 .stats-container svg { color: #ffc107; }
@@ -94,7 +98,7 @@ body {
     gap: 10px;
     flex-grow: 1;
 }
-.filter-label { font-weight: 700; font-size: 0.95em; color: var(--text-secondary-color); } /* Зробив жирнішим */
+.filter-label { font-weight: 500; font-size: 0.95em; color: var(--text-secondary-color); }
 .segmented-control {
     display: inline-flex;
     background-color: #e9ecef;
@@ -111,13 +115,12 @@ body {
     cursor: pointer;
     transition: background-color 0.2s ease, color 0.2s ease;
     border-right: 1px solid var(--border-color);
-    font-family: inherit; /* Наслідуємо шрифт */
 }
 .segmented-control .filter-btn:last-child { border-right: none; }
 .segmented-control .filter-btn.active {
     background-color: var(--primary-color);
     color: white;
-    font-weight: 700; /* Зробив жирнішим */
+    font-weight: 500;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 .segmented-control .filter-btn:not(.active):hover { background-color: #dfe4ea; }
@@ -132,7 +135,7 @@ body {
     border-radius: var(--border-radius-small);
     cursor: pointer;
     font-size: 0.9em;
-    font-weight: 700; /* Зробив жирнішим */
+    font-weight: 500;
     transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
     white-space: nowrap;
@@ -169,29 +172,30 @@ body {
 
 .device-card h3 {
     margin-top: 0;
-    margin-bottom: 2px;
+    margin-bottom: 2px; /* Зменшив відступ */
     font-size: 1.05em;
     color: var(--text-color);
-    font-weight: 700; /* Зробив жирнішим */
+    font-weight: 500; /* Зробив трохи жирнішим */
     line-height: 1.3;
 }
 
+/* Тип приладу з нового рядка */
 .device-type-container {
     font-size: 0.9em;
     color: var(--type-color);
-    font-weight: 700; /* Зробив жирнішим */
-    margin-bottom: 8px;
+    font-weight: 700;
+    margin-bottom: 8px; /* Відступ після типу */
 }
 
 .device-card p {
-    margin: 3px 0;
-    font-size: 0.9em; /* Збільшив для Lato */
+    margin: 3px 0; /* Ще зменшив */
+    font-size: 0.85em;
     color: #495057;
     display: flex;
     align-items: baseline;
     word-break: break-word;
 }
-.device-card strong { color: var(--text-color); font-weight: 700; margin-right: 6px; flex-shrink: 0; width: 100px; } /* Зробив жирнішим */
+.device-card strong { color: var(--text-color); font-weight: 500; margin-right: 6px; flex-shrink: 0; width: 100px; }
 .notes-text { font-style: italic; color: var(--text-secondary-color); }
 
 /* Шкала повірки */
@@ -201,7 +205,7 @@ body {
 .timeline-progress.warning { background-color: var(--warning-scale-color); }
 .timeline-progress.expired { background-color: var(--expired-scale-color); }
 
-.date-cell { padding: 3px 6px; border-radius: var(--border-radius-small); font-weight: 700; font-size: 0.8em; border: 1px solid transparent; text-align: center; min-width: 80px; display: inline-block; margin-left: 5px; } /* Зробив жирнішим */
+.date-cell { padding: 3px 6px; border-radius: var(--border-radius-small); font-weight: 500; font-size: 0.8em; border: 1px solid transparent; text-align: center; min-width: 80px; display: inline-block; margin-left: 5px; }
 .date-warning { background-color: var(--warning-bg); border-color: var(--warning-border); color: var(--warning-text); }
 .date-expired { background-color: var(--expired-bg); border-color: var(--expired-border); color: var(--expired-text); }
 
@@ -214,39 +218,43 @@ body {
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: hidden;
+    overflow: hidden; /* Забороняємо скрол самого вікна */
     background-color: rgba(28, 49, 68, 0.6);
-    padding: 15px;
+    padding: 15px; /* Відступи безпечної зони */
     box-sizing: border-box;
 }
+
+/* Обгортка для центрування та скролу */
 .modal-outer {
     width: 100%;
     height: 100%;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    align-items: center; /* Центрування по вертикалі */
+    justify-content: center; /* Центрування по горизонталі */
 }
+
 .modal-content {
     background-color: #fefefe;
     padding: 20px 25px;
     border: none;
     border-radius: var(--border-radius);
-    width: 100%;
-    max-width: 500px;
-    max-height: 90vh;
-    overflow-y: auto;
+    width: 100%; /* Ширина відносно батька (.modal-outer) */
+    max-width: 500px; /* Максимальна ширина */
+    max-height: 90vh; /* Максимальна висота - 90% висоти екрану */
+    overflow-y: auto; /* Додаємо вертикальний скрол, якщо вміст не влазить */
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-    position: relative;
+    position: relative; /* Для позиціонування кнопки закриття */
     animation: fadeInScale 0.3s ease-out;
     box-sizing: border-box;
 }
+
 @keyframes fadeInScale { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
 .close-btn {
     color: #aaa;
     background: none;
     border: none;
-    position: absolute;
+    position: absolute; /* Позиціонуємо відносно .modal-content */
     top: 8px;
     right: 10px;
     font-size: 26px;
@@ -255,14 +263,14 @@ body {
     cursor: pointer;
     padding: 5px;
     transition: color 0.2s ease;
-    z-index: 10;
+    z-index: 10; /* Щоб була над контентом */
 }
 .close-btn:hover, .close-btn:focus { color: #333; outline: none; }
 
 /* Стили для форми */
-#modal h2 { margin-top: 0; margin-bottom: 20px; font-size: 1.25em; font-weight: 700; text-align: center; color: var(--text-color); } /* Зробив жирнішим */
+#modal h2 { margin-top: 0; margin-bottom: 20px; font-size: 1.25em; font-weight: 500; text-align: center; color: var(--text-color); }
 .form-group { margin-bottom: 12px; }
-#device-form label { display: block; margin-bottom: 4px; font-weight: 700; font-size: 0.85em; color: #333; } /* Зробив жирнішим */
+#device-form label { display: block; margin-bottom: 4px; font-weight: 500; font-size: 0.85em; color: #333; }
 #device-form input[type="text"],
 #device-form input[type="number"],
 #device-form input[type="date"],
