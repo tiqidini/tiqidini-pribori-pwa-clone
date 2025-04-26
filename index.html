@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ffffff"/>
+    <title>Список Приладів</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <!-- Додайте сюди іконки для різних розмірів -->
+    <link rel="apple-touch-icon" href="img/icon-192x192.png"> 
+</head>
+<body>
+    <h1>Список вимірювальних приладів</h1>
+
+    <div class="controls">
+        <button id="add-device-btn">Додати прилад</button>
+        <input type="text" id="filter-input" placeholder="Фільтр за назвою, типом, №...">
+    </div>
+
+    <div id="device-list" class="device-list-container">
+        <!-- Карточки приладів будуть генеруватися тут -->
+    </div>
+
+    <!-- Модальне вікно/форма для додавання/редагування -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2 id="modal-title">Додати/Редагувати Прилад</h2>
+            <form id="device-form">
+                <input type="hidden" id="device-id">
+                
+                <label for="device-rm">РМ:</label>
+                <input type="text" id="device-rm" required>
+                
+                <label for="device-name">Найменування:</label>
+                <input type="text" id="device-name" required>
+                
+                <label for="device-type">Тип:</label>
+                <input type="text" id="device-type" required>
+                
+                <label for="device-serial">Заводський номер:</label>
+                <input type="text" id="device-serial" required>
+                
+                <label for="device-lastCheckDate">Дата останньої повірки:</label>
+                <input type="date" id="device-lastCheckDate">
+                
+                <label for="device-mpi">МПІ (роки):</label>
+                <input type="number" id="device-mpi" min="1">
+                
+                <label for="device-location">Де прилад:</label>
+                <input type="text" id="device-location">
+
+                 <label for="device-notes">Примітки:</label>
+                <textarea id="device-notes" rows="2"></textarea>
+                
+                <button type="submit" id="save-device-btn">Зберегти</button>
+                <button type="button" id="delete-device-btn" class="delete-btn">Видалити</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script> <!-- Підключаємо дані -->
+    <script src="js/script.js"></script>
+    <script>
+        // Реєстрація Service Worker
+        if ('serviceWorker' in navigator) {
+            // ВАЖЛИВО: Замініть /YOUR_REPO_NAME/ на назву вашого репозиторію!
+            const swPath = '/pribori-pwa/service-worker.js';
+            const swScope = '/pribori-pwa/';
+
+            navigator.serviceWorker.register(swPath, { scope: swScope })
+            .then(registration => {
+                console.log('Service Worker зареєстровано з областю видимості:', registration.scope);
+            })
+            .catch(error => {
+                console.error('Помилка реєстрації Service Worker:', error);
+            });
+        }
+    </script>
+</body>
+</html> 
