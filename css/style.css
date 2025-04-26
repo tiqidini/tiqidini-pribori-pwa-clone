@@ -1,30 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
 /* Базові стилі будуть тут */
 :root {
-    --primary-color: #4CAF50;
-    --secondary-color: #f1f1f1;
-    --text-color: #333;
-    --card-bg: #fff;
-    --shadow-color: rgba(0, 0, 0, 0.1);
-    --warning-bg: #fffbe6; /* Желтый фон */
-    --warning-border: #ffe58f;
-    --expired-bg: #fff1f0; /* Оранжевый/красный фон */
-    --expired-border: #ffa39e;
-    --danger-color: #f44336;
+    --primary-color: #2a9d8f; /* Более приглушенный зеленый */
+    --secondary-color: #f8f9fa; /* Светло-серый фон */
+    --text-color: #495057; /* Темно-серый текст */
+    --card-bg: #ffffff;
+    --shadow-color: rgba(0, 0, 0, 0.08);
+    --border-color: #dee2e6; /* Цвет границ */
+    --warning-bg: #fff3cd; 
+    --warning-border: #ffeeba;
+    --warning-text: #856404;
+    --expired-bg: #f8d7da;
+    --expired-border: #f5c6cb;
+    --expired-text: #721c24;
+    --danger-color: #e76f51; /* Оранжево-красный для удаления */
+    --type-color: #264653; /* Цвет для типа прибора */
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     margin: 0;
-    padding: 15px;
+    padding: 20px;
     background-color: var(--secondary-color);
     color: var(--text-color);
-    line-height: 1.5;
+    line-height: 1.6;
 }
 
 h1 {
     text-align: center;
     color: var(--primary-color);
-    margin-bottom: 20px;
+    margin-bottom: 25px;
+    font-weight: 500;
 }
 
 /* Елементи управління */
@@ -32,47 +39,69 @@ h1 {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 15px; /* Уменьшил отступ */
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 15px;
 }
 
 #add-device-btn {
-    padding: 10px 15px;
+    padding: 10px 20px;
     background-color: var(--primary-color);
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 6px; /* Немного скруглил */
     cursor: pointer;
-    font-size: 1em;
-    transition: background-color 0.3s ease;
+    font-size: 0.95em;
+    font-weight: 500;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 #add-device-btn:hover {
-    background-color: #45a049;
+    background-color: #258c80; /* Немного темнее при наведении */
+}
+
+#add-device-btn:active {
+    transform: scale(0.98);
 }
 
 #filter-input {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 1em;
-    flex-grow: 1; /* Занимает доступное пространство */
-    min-width: 200px; /* Минимальная ширина */
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.95em;
+    flex-grow: 1; 
+    min-width: 220px; 
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#filter-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(42, 157, 143, 0.2);
+}
+
+/* Счетчик приборов */
+.device-count-container {
+    text-align: right;
+    margin-bottom: 10px;
+    color: #6c757d; /* Серый цвет */
+    font-size: 0.9em;
 }
 
 /* Список карточек */
 .device-list-container {
     display: grid;
-    grid-template-columns: 1fr; /* Одна колонка по умолчанию */
-    gap: 15px;
+    grid-template-columns: 1fr; 
+    gap: 18px; /* Немного увеличил */
 }
 
 .device-card {
     background-color: var(--card-bg);
     border-radius: 8px;
-    padding: 15px;
-    box-shadow: 0 2px 5px var(--shadow-color);
+    padding: 18px;
+    box-shadow: 0 3px 6px var(--shadow-color);
+    border: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
     cursor: pointer;
@@ -80,52 +109,63 @@ h1 {
 }
 
 .device-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 8px var(--shadow-color);
+    transform: translateY(-4px);
+    box-shadow: 0 6px 12px var(--shadow-color);
 }
 
 .device-card h3 {
     margin-top: 0;
-    margin-bottom: 10px;
-    font-size: 1.1em;
+    margin-bottom: 12px;
+    font-size: 1.15em;
     color: var(--primary-color);
+    font-weight: 500;
+}
+
+.device-card .device-type {
+    color: var(--type-color); /* Цвет для типа */
+    font-weight: 500; /* Немного жирнее */
 }
 
 .device-card p {
-    margin: 3px 0;
+    margin: 4px 0;
     font-size: 0.9em;
     color: #555;
-    word-wrap: break-word; /* Перенос длинных слов */
+    word-wrap: break-word; 
 }
 
 .device-card strong {
     color: var(--text-color);
-    min-width: 130px; /* Выравнивание по ширине */
+    min-width: 120px; /* Уменьшил для компактности */
     display: inline-block;
+    font-weight: 500;
+    margin-right: 5px;
 }
 
 .date-cell {
-    padding: 2px 6px;
+    padding: 3px 8px;
     border-radius: 4px;
     display: inline-block;
     margin-top: 5px;
+    font-weight: 500;
+    font-size: 0.85em;
+    border: 1px solid transparent; /* Добавляем рамку для консистентности */
 }
 
 .date-warning {
     background-color: var(--warning-bg);
-    border: 1px solid var(--warning-border);
-    color: #d48806;
+    border-color: var(--warning-border);
+    color: var(--warning-text);
 }
 
 .date-expired {
     background-color: var(--expired-bg);
-    border: 1px solid var(--expired-border);
-    color: #cf1322;
+    border-color: var(--expired-border);
+    color: var(--expired-text);
 }
 
 /* Модальне вікно */
 .modal {
-    display: none; /* Скрыто по умолчанию */
+    display: none; 
     position: fixed; 
     z-index: 1000; 
     left: 0;
@@ -133,70 +173,97 @@ h1 {
     width: 100%;
     height: 100%; 
     overflow: auto; 
-    background-color: rgba(0,0,0,0.5); /* Полупрозрачный фон */
+    background-color: rgba(0,0,0,0.6); /* Немного темнее фон */
+    padding-top: 50px; /* Отступ сверху */
 }
 
 .modal-content {
     background-color: #fefefe;
-    margin: 10% auto; 
-    padding: 25px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+    margin: auto; /* Убрал % - будет по центру */
+    padding: 30px;
+    border: none; /* Убрал рамку */
+    border-radius: 10px;
     width: 90%; 
-    max-width: 500px; 
-    box-shadow: 0 5px 15px var(--shadow-color);
+    max-width: 550px; 
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
     position: relative;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
 
 .close-btn {
     color: #aaa;
     position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 28px;
+    top: 15px;
+    right: 20px;
+    font-size: 32px;
     font-weight: bold;
+    line-height: 1;
     cursor: pointer;
+    transition: color 0.2s ease;
 }
 
 .close-btn:hover,
 .close-btn:focus {
-    color: black;
+    color: #555;
     text-decoration: none;
 }
 
 /* Стили для формы */
 #device-form label {
     display: block;
-    margin-top: 10px;
-    margin-bottom: 3px;
-    font-weight: bold;
+    margin-top: 12px;
+    margin-bottom: 4px;
+    font-weight: 500;
     font-size: 0.9em;
+    color: #333;
 }
 
 #device-form input[type="text"],
 #device-form input[type="number"],
 #device-form input[type="date"],
 #device-form textarea {
-    width: calc(100% - 22px); /* Учет padding и border */
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    width: 100%; /* Заполнение контейнера */
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
     font-size: 1em;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+    box-sizing: border-box; /* Учитываем padding и border в ширине */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#device-form input:focus,
+#device-form textarea:focus {
+     outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(42, 157, 143, 0.2);
 }
 
 #device-form textarea {
-    resize: vertical; /* Разрешить изменять размер по вертикали */
+    resize: vertical; 
+    min-height: 60px;
+}
+
+.form-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
 }
 
 #device-form button {
-    padding: 12px 20px;
+    padding: 12px 25px;
     border: none;
-    border-radius: 5px;
+    border-radius: 6px;
     cursor: pointer;
     font-size: 1em;
-    margin-top: 15px;
-    transition: background-color 0.3s ease;
+    font-weight: 500;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 #save-device-btn {
@@ -205,21 +272,25 @@ h1 {
 }
 
 #save-device-btn:hover {
-    background-color: #45a049;
+    background-color: #258c80;
 }
 
 #delete-device-btn {
     background-color: var(--danger-color);
     color: white;
-    float: right; /* Кнопка удаления справа */
+    /* Убрал float, используем flex в .form-buttons */
 }
 
 #delete-device-btn:hover {
-    background-color: #da190b;
+    background-color: #d75a3b; /* Темнее */
+}
+
+#device-form button:active {
+    transform: scale(0.98);
 }
 
 #delete-device-btn.hidden {
-    display: none; /* Скрыть кнопку удаления для новых записей */
+    display: none; 
 }
 
 
@@ -227,19 +298,20 @@ h1 {
 /* Для планшетов и небольших десктопов */
 @media (min-width: 600px) {
     .device-list-container {
-        grid-template-columns: repeat(2, 1fr); /* Две колонки */
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Адаптивное количество колонок */
     }
     .modal-content {
-        margin: 10% auto; 
+       /* margin остается auto */
+    }
+    body {
+        padding: 30px;
     }
 }
 
 /* Для больших десктопов */
 @media (min-width: 992px) {
-    .device-list-container {
-        grid-template-columns: repeat(3, 1fr); /* Три колонки */
-    }
+    /* grid-template-columns уже адаптивный */
      body {
-        padding: 30px;
+        padding: 40px;
     }
 } 

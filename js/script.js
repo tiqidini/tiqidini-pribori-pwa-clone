@@ -13,6 +13,7 @@ const deviceForm = document.getElementById('device-form');
 const modalTitle = document.getElementById('modal-title');
 const filterInput = document.getElementById('filter-input');
 const deleteDeviceBtn = document.getElementById('delete-device-btn');
+const deviceCountElement = document.getElementById('device-count');
 
 // Ключ для localStorage
 const STORAGE_KEY = 'priboriAppData';
@@ -95,24 +96,62 @@ function loadData() {
 
 // --- Основна логіка рендерингу ---
 
+// Функція для сортування приладів
+function sortDevices(devicesToSort) {
+    return devicesToSort.sort((a, b) => {
+        const statusA = getNextCheckDateStatus(a.nextCheckDate);
+        const statusB = getNextCheckDateStatus(b.nextCheckDate);
+
+        // Пріоритети: expired > warning > normal > null/invalid
+        const priority = {
+            'date-expired': 3,
+            'date-warning': 2,
+            '': 1, // Нормальний статус
+        };
+
+        // Якщо дата null або невірна, ставимо найнижчий пріоритет
+        const priorityA = statusA.class ? (priority[statusA.class] || 0) : 0;
+        const priorityB = statusB.class ? (priority[statusB.class] || 0) : 0;
+
+        if (priorityB !== priorityA) {
+            return priorityB - priorityA; // Спочатку з вищим пріоритетом
+        }
+
+        // Якщо пріоритети однакові, сортуємо за датою (спочатку ті, що раніше)
+        const dateA = a.nextCheckDate ? new Date(a.nextCheckDate) : new Date(9999, 0, 1); // Далека дата для null
+        const dateB = b.nextCheckDate ? new Date(b.nextCheckDate) : new Date(9999, 0, 1);
+         if (isNaN(dateA.getTime())) dateA = new Date(9999, 0, 1);
+        if (isNaN(dateB.getTime())) dateB = new Date(9999, 0, 1);
+
+        return dateA - dateB;
+    });
+}
+
 // Функція для відображення списку приладів
 function renderDeviceList(devicesToRender) {
     deviceListContainer.innerHTML = ''; // Очищуємо контейнер
 
-    if (!devicesToRender || devicesToRender.length === 0) {
+    const count = devicesToRender ? devicesToRender.length : 0;
+    deviceCountElement.textContent = count; // Оновлюємо лічильник
+
+    if (count === 0) {
         deviceListContainer.innerHTML = '<p>Немає приладів для відображення.</p>';
         return;
     }
 
-    devicesToRender.forEach(device => {
+    // Сортуємо прилади перед відображенням
+    const sortedDevices = sortDevices([...devicesToRender]); // Сортуємо копію
+
+    sortedDevices.forEach(device => {
         const card = document.createElement('div');
         card.classList.add('device-card');
-        card.dataset.id = device.id; // Зберігаємо ID для обробки кліків
+        card.dataset.id = device.id;
 
         const nextCheckStatus = getNextCheckDateStatus(device.nextCheckDate);
 
+        // Додаємо клас device-type до типу приладу
         card.innerHTML = `
-            <h3>${device.name} (${device.type})</h3>
+            <h3>${device.name} (<span class="device-type">${device.type || '-'}</span>)</h3> 
             <p><strong>Зав. №:</strong> ${device.serial || '-'}</p>
             <p><strong>РМ:</strong> ${device.rm || '-'}</p>
             <p><strong>Розташування:</strong> ${device.location || '-'}</p>
@@ -124,9 +163,7 @@ function renderDeviceList(devicesToRender) {
             ${device.notes ? `<p><strong>Примітки:</strong> ${device.notes}</p>` : ''}
         `;
 
-        // Додаємо обробник для відкриття модального вікна редагування
         card.addEventListener('click', () => openModal(device));
-
         deviceListContainer.appendChild(card);
     });
 }
