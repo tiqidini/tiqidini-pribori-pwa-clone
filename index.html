@@ -15,7 +15,11 @@
 
     <div class="controls">
         <button id="add-device-btn">Додати прилад</button>
-        <input type="text" id="filter-input" placeholder="Фільтр за назвою, типом, №...">
+        <input type="text" id="filter-input" placeholder="Фільтр за назвою, типом, №, РМ...">
+    </div>
+
+    <div class="device-count-container">
+        <span id="device-count"></span> прилад(ів)
     </div>
 
     <div id="device-list" class="device-list-container">
@@ -54,8 +58,10 @@
                  <label for="device-notes">Примітки:</label>
                 <textarea id="device-notes" rows="2"></textarea>
                 
-                <button type="submit" id="save-device-btn">Зберегти</button>
-                <button type="button" id="delete-device-btn" class="delete-btn">Видалити</button>
+                <div class="form-buttons">
+                    <button type="submit" id="save-device-btn">Зберегти</button>
+                    <button type="button" id="delete-device-btn" class="delete-btn hidden">Видалити</button> 
+                </div>
             </form>
         </div>
     </div>
