@@ -3,30 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#ffffff"/>
-    <title>Список Приладів</title>
+    <meta name="theme-color" content="#3a86ff"/> <title>Список Приладів</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="img/icon-192x192.png">
-    </head>
+    <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
+
+</head>
 <body>
     <header class="app-header">
-        <h1>Список вимірювальних приладів</h1>
+        <div class="header-content">
+            <h1>Список приладів</h1>
+            <div id="stats-overdue" class="stats-container" title="Кількість приладів з простроченою повіркою">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
+                  <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+                </svg>
+                <span id="overdue-count">0</span>
+            </div>
+        </div>
     </header>
 
     <main class="container">
         <div class="controls">
+             <div class="filter-rm-container">
+                <span class="filter-label">РМ:</span>
+                <div class="segmented-control" id="rm-filter">
+                    <button class="filter-btn active" data-rm="all">Всі</button>
+                    <button class="filter-btn" data-rm="111">111</button>
+                    <button class="filter-btn" data-rm="112">112</button>
+                    </div>
+            </div>
             <button id="add-device-btn" class="button button-primary">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
                   <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
                 </svg>
-                Додати прилад
+                Додати
             </button>
-            <input type="text" id="filter-input" placeholder="Фільтр за назвою, типом, №, РМ...">
-        </div>
+             </div>
 
         <div class="device-count-container">
             Показано: <span id="device-count">0</span> прилад(ів)
@@ -79,6 +96,11 @@
                     <input type="text" id="device-location">
                 </div>
 
+                <div class="form-group">
+                    <label for="device-calibrationLocation">Місце калібрування:</label>
+                    <input type="text" id="device-calibrationLocation">
+                </div>
+
                  <div class="form-group">
                     <label for="device-notes">Примітки:</label>
                     <textarea id="device-notes" rows="3"></textarea>
@@ -107,12 +129,10 @@
     <script>
         // Реєстрація Service Worker
         if ('serviceWorker' in navigator) {
-            // Переконайтесь, що шлях правильний для вашого середовища (особливо для GitHub Pages)
             const swPath = 'service-worker.js'; // Якщо SW в корені
-            // const swScope = '/pribori-pwa/'; // Для GitHub Pages
-            navigator.serviceWorker.register(swPath /*, { scope: swScope } */)
+            navigator.serviceWorker.register(swPath)
             .then(registration => {
-                console.log('Service Worker зареєстровано:', registration);
+                console.log('Service Worker зареєстровано:', registration.scope);
             })
             .catch(error => {
                 console.error('Помилка реєстрації Service Worker:', error);

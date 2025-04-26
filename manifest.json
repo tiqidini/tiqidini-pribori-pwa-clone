@@ -1,54 +1,54 @@
 {
-  "name": "Список Приладів",
+  "name": "Список Приладів (Облік)",
   "short_name": "Прилади",
-  "description": "Додаток для обліку вимірювальних приладів та їх повірок",
-  "start_url": "/pribori-pwa/index.html",
-  "scope": "/pribori-pwa/",
+  "description": "Додаток для обліку вимірювальних приладів, їх повірок та калібрувань",
+  "start_url": ".",
+  "scope": ".",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#4CAF50",
+  "background_color": "#f0f4f8",
+  "theme_color": "#3a86ff",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/pribori-pwa/img/icon-72x72.png",
+      "src": "img/icon-72x72.png",
       "sizes": "72x72",
       "type": "image/png"
     },
     {
-      "src": "/pribori-pwa/img/icon-96x96.png",
-      "sizes": "96x96",
-      "type": "image/png"
-    },
-    {
-      "src": "/pribori-pwa/img/icon-128x128.png",
+      "src": "img/icon-128x128.png",
       "sizes": "128x128",
       "type": "image/png"
     },
     {
-      "src": "/pribori-pwa/img/icon-144x144.png",
+      "src": "img/icon-144x144.png",
       "sizes": "144x144",
       "type": "image/png"
     },
     {
-      "src": "/pribori-pwa/img/icon-152x152.png",
-      "sizes": "152x152",
-      "type": "image/png"
-    },
-    {
-      "src": "/pribori-pwa/img/icon-192x192.png",
+      "src": "img/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "/pribori-pwa/img/icon-384x384.png",
+      "src": "img/icon-384x384.png",
       "sizes": "384x384",
       "type": "image/png"
     },
     {
-      "src": "/pribori-pwa/img/icon-512x512.png",
+      "src": "img/icon-512x512.png",
       "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "img/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "img/favicon-16x16.png",
+      "sizes": "16x16",
       "type": "image/png"
     }
   ]
-} 
+}

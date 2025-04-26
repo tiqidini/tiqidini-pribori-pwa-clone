@@ -2,24 +2,29 @@
 
 /* Базові змінні */
 :root {
-    --primary-color: #2a9d8f; /* Приглушений бірюзовий */
-    --secondary-color: #e9f5f4; /* Дуже світлий бірюзовий фон */
-    --text-color: #264653; /* Темно-синьо-зелений */
+    --primary-color: #3a86ff; /* Яскравий синій */
+    --primary-hover-color: #3173dc;
+    --secondary-color: #f0f4f8; /* Світло-сіро-блакитний фон */
+    --text-color: #1c3144; /* Темно-синій */
     --text-secondary-color: #6c757d; /* Сірий */
     --card-bg: #ffffff;
-    --shadow-color: rgba(42, 157, 143, 0.15); /* Тінь в тон основному кольору */
-    --border-color: #dee2e6;
+    --shadow-color-light: rgba(58, 134, 255, 0.1); /* Світла тінь в тон */
+    --shadow-color-medium: rgba(58, 134, 255, 0.15);
+    --border-color: #d1d9e6; /* Світліша рамка */
     --warning-bg: #fff3cd;
     --warning-border: #ffeeba;
     --warning-text: #856404;
+    --warning-scale-color: #ffc107; /* Жовтий для шкали */
     --expired-bg: #f8d7da;
     --expired-border: #f5c6cb;
     --expired-text: #721c24;
+    --expired-scale-color: #dc3545; /* Червоний для шкали */
+    --ok-scale-color: #28a745; /* Зелений для шкали */
     --danger-color: #e76f51; /* Оранжево-червоний */
     --danger-hover-color: #d75a3b;
-    --primary-hover-color: #258c80;
-    --type-color: #2a9d8f; /* Основний колір для типу */
-    --border-radius: 8px; /* Стандартний радіус */
+    --type-color: #0077b6; /* Інший синій для типу */
+    --border-radius: 8px;
+    --border-radius-small: 5px;
 }
 
 /* Загальні стилі */
@@ -34,23 +39,50 @@ body {
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 15px; /* Зменшив падінг для мобільних */
 }
 
 /* Шапка */
 .app-header {
-    background-color: var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-color) 0%, #5a9fff 100%); /* Градієнт */
     color: white;
-    padding: 15px 20px;
-    text-align: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 12px 15px; /* Зменшив падінг */
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
+    position: sticky; /* Закріплення шапки */
+    top: 0;
+    z-index: 100;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px; /* Обмеження ширини контенту в шапці */
+    margin: 0 auto;
 }
 
 .app-header h1 {
     margin: 0;
-    font-size: 1.5em;
+    font-size: 1.3em; /* Трохи менший */
     font-weight: 500;
+}
+
+/* Статистика в шапці */
+.stats-container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 5px 10px;
+    border-radius: var(--border-radius-small);
+    font-size: 0.9em;
+    font-weight: 500;
+    cursor: default; /* Підказка при наведенні */
+}
+
+.stats-container svg {
+    color: #ffc107; /* Жовтий для іконки попередження */
 }
 
 /* Елементи управління */
@@ -60,68 +92,97 @@ body {
     gap: 15px;
     margin-bottom: 15px;
     align-items: center;
+    justify-content: space-between; /* Розносимо елементи */
 }
+
+/* Фільтр РМ */
+.filter-rm-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-grow: 1; /* Займає доступне місце */
+}
+
+.filter-label {
+    font-weight: 500;
+    font-size: 0.95em;
+    color: var(--text-secondary-color);
+}
+
+.segmented-control {
+    display: inline-flex;
+    background-color: #e9ecef;
+    border-radius: var(--border-radius-small);
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.segmented-control .filter-btn {
+    padding: 6px 12px; /* Компактніші кнопки */
+    border: none;
+    background-color: transparent;
+    color: var(--text-secondary-color);
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    border-right: 1px solid var(--border-color); /* Розділювач */
+}
+.segmented-control .filter-btn:last-child {
+    border-right: none;
+}
+
+.segmented-control .filter-btn.active {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 500;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.segmented-control .filter-btn:not(.active):hover {
+    background-color: #dfe4ea;
+}
+
 
 /* Стилі для кнопок */
 .button {
-    display: inline-flex; /* Для вирівнювання іконки і тексту */
+    display: inline-flex;
     align-items: center;
-    gap: 8px; /* Відстань між іконкою і текстом */
-    padding: 10px 20px;
+    gap: 8px;
+    padding: 8px 15px; /* Зменшив падінг */
     border: none;
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius-small); /* Менший радіус */
     cursor: pointer;
-    font-size: 0.95em;
+    font-size: 0.9em; /* Менший шрифт */
     font-weight: 500;
     transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    white-space: nowrap; /* Заборона переносу тексту */
 }
 
 .button svg {
-    vertical-align: middle; /* Краще вирівнювання іконки */
+    vertical-align: middle;
 }
-
 
 .button-primary {
     background-color: var(--primary-color);
     color: white;
 }
-
 .button-primary:hover {
     background-color: var(--primary-hover-color);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12);
 }
 
 .button-danger {
     background-color: var(--danger-color);
     color: white;
 }
-
 .button-danger:hover {
     background-color: var(--danger-hover-color);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12);
 }
 
 .button:active {
-    transform: scale(0.98);
-}
-
-/* Фільтр */
-#filter-input {
-    padding: 10px 15px;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    font-size: 1em;
-    flex-grow: 1; /* Займає доступний простір */
-    min-width: 200px; /* Мінімальна ширина */
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    box-sizing: border-box;
-}
-
-#filter-input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px var(--shadow-color);
+    transform: scale(0.97); /* Трохи сильніше натискання */
 }
 
 /* Лічильник приладів */
@@ -135,79 +196,104 @@ body {
 /* Список карточек */
 .device-list-container {
     display: grid;
-    grid-template-columns: 1fr; /* Одна колонка за замовчуванням */
-    gap: 20px;
+    grid-template-columns: 1fr;
+    gap: 15px; /* Зменшив gap */
 }
 
-.loading-placeholder {
+.loading-placeholder, .no-devices {
     text-align: center;
     padding: 40px;
     color: var(--text-secondary-color);
     font-size: 1.1em;
+    grid-column: 1 / -1; /* Займає всю ширину гріда */
 }
 
 .device-card {
     background-color: var(--card-bg);
     border-radius: var(--border-radius);
-    padding: 20px;
-    box-shadow: 0 4px 12px var(--shadow-color);
-    border: 1px solid #e0e0e0;
+    padding: 15px; /* Зменшив падінг */
+    box-shadow: 0 3px 8px var(--shadow-color-light);
+    border: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative; /* Для позиціонування шкали */
+    overflow: hidden; /* Щоб шкала не виходила за межі */
 }
 
 .device-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px var(--shadow-color);
+    transform: translateY(-4px);
+    box-shadow: 0 6px 12px var(--shadow-color-medium);
 }
 
 .device-card h3 {
     margin-top: 0;
-    margin-bottom: 10px;
-    font-size: 1.1em; /* Трохи менший */
+    margin-bottom: 8px; /* Зменшив */
+    font-size: 1.05em; /* Трохи менший */
     color: var(--text-color);
     font-weight: 500;
     line-height: 1.3;
 }
 
-/* Виділення типу приладу */
 .device-card .device-type {
     color: var(--type-color);
-    font-weight: 700; /* Більш жирний */
-    /* Можна додати фон або рамку, якщо потрібно більше виділення */
-    /* background-color: #e0f2f1; */
-    /* padding: 2px 6px; */
-    /* border-radius: 4px; */
+    font-weight: 700;
 }
 
 .device-card p {
-    margin: 5px 0;
-    font-size: 0.9em;
-    color: #555;
-    word-wrap: break-word;
-    display: flex; /* Для кращого вирівнювання */
-    align-items: baseline; /* Вирівнювання по базовій лінії */
+    margin: 4px 0; /* Зменшив */
+    font-size: 0.85em; /* Менший шрифт */
+    color: #495057; /* Трохи темніший сірий */
+    display: flex;
+    align-items: baseline;
+    word-break: break-word; /* Перенос довгих слів */
 }
 
 .device-card strong {
     color: var(--text-color);
     font-weight: 500;
-    margin-right: 8px;
-    flex-shrink: 0; /* Забороняємо зменшуватись */
-    width: 110px; /* Фіксована ширина для вирівнювання */
+    margin-right: 6px; /* Зменшив */
+    flex-shrink: 0;
+    width: 100px; /* Зменшив ширину */
 }
 
+.notes-text {
+    font-style: italic;
+    color: var(--text-secondary-color);
+}
+
+/* Візуалізація дати (шкала) */
+.calibration-timeline {
+    width: 100%;
+    height: 5px; /* Тонка шкала */
+    background-color: #e9ecef; /* Фон шкали */
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 8px; /* Відступ зверху */
+}
+
+.timeline-progress {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s ease-out, background-color 0.5s ease;
+}
+
+.timeline-progress.ok { background-color: var(--ok-scale-color); }
+.timeline-progress.warning { background-color: var(--warning-scale-color); }
+.timeline-progress.expired { background-color: var(--expired-scale-color); }
+
+
 .date-cell {
-    padding: 4px 8px;
-    border-radius: 4px;
+    padding: 3px 6px; /* Компактніше */
+    border-radius: var(--border-radius-small);
     font-weight: 500;
-    font-size: 0.85em;
+    font-size: 0.8em; /* Ще менший шрифт */
     border: 1px solid transparent;
     text-align: center;
-    min-width: 90px; /* Мінімальна ширина для консистентності */
+    min-width: 80px;
     display: inline-block;
+    margin-left: 5px; /* Відступ від тексту */
 }
 
 .date-warning {
@@ -232,20 +318,19 @@ body {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgba(0, 0, 0, 0.5); /* Зменшив прозорість */
-    padding-top: 30px; /* Менший відступ */
-    padding-bottom: 30px;
+    background-color: rgba(28, 49, 68, 0.6); /* Темніший фон */
+    padding: 20px 15px; /* Падінг для відступів на мобільних */
 }
 
 .modal-content {
     background-color: #fefefe;
     margin: auto;
-    padding: 25px 30px; /* Оновлені падінги */
+    padding: 20px 25px;
     border: none;
     border-radius: var(--border-radius);
-    width: 90%;
-    max-width: 500px; /* Трохи вужче */
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    width: 95%; /* Більша ширина на моб */
+    max-width: 500px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
     position: relative;
     animation: fadeInScale 0.3s ease-out;
 }
@@ -260,41 +345,36 @@ body {
     background: none;
     border: none;
     position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 28px; /* Трохи менший */
+    top: 8px; /* Ближче до краю */
+    right: 10px;
+    font-size: 26px;
     font-weight: bold;
     line-height: 1;
     cursor: pointer;
-    padding: 5px; /* Зона кліку */
+    padding: 5px;
     transition: color 0.2s ease;
 }
-
-.close-btn:hover,
-.close-btn:focus {
-    color: #333;
-    outline: none;
-}
+.close-btn:hover, .close-btn:focus { color: #333; outline: none; }
 
 /* Стили для форми */
 #modal h2 {
     margin-top: 0;
     margin-bottom: 20px;
-    font-size: 1.3em;
+    font-size: 1.25em;
     font-weight: 500;
     text-align: center;
     color: var(--text-color);
 }
 
 .form-group {
-    margin-bottom: 15px; /* Відступи між полями */
+    margin-bottom: 12px; /* Менші відступи */
 }
 
 #device-form label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
     font-weight: 500;
-    font-size: 0.9em;
+    font-size: 0.85em; /* Менший лейбл */
     color: #333;
 }
 
@@ -303,74 +383,64 @@ body {
 #device-form input[type="date"],
 #device-form textarea {
     width: 100%;
-    padding: 10px 12px;
+    padding: 8px 10px; /* Менші падінги */
     border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    font-size: 1em;
+    border-radius: var(--border-radius-small);
+    font-size: 0.95em; /* Трохи менший шрифт */
     box-sizing: border-box;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    font-family: inherit; /* Наслідуємо шрифт */
+    font-family: inherit;
 }
 
 #device-form input:focus,
 #device-form textarea:focus {
      outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px var(--shadow-color);
+    box-shadow: 0 0 0 3px var(--shadow-color-light);
 }
 
 #device-form textarea {
     resize: vertical;
-    min-height: 80px;
+    min-height: 70px;
 }
 
 .form-buttons {
     display: flex;
-    justify-content: space-between; /* Розносимо кнопки */
-    margin-top: 25px;
-    gap: 15px; /* Відступ між кнопками */
+    justify-content: space-between;
+    margin-top: 20px;
+    gap: 10px;
 }
 
 #device-form button {
-    flex-grow: 1; /* Кнопки займають рівний простір */
-    /* Стилі кнопок вже визначені через .button */
+    flex-grow: 1;
+    padding: 10px 15px; /* Оновлені падінги кнопок форми */
 }
 
-#delete-device-btn.hidden {
-    display: none;
-}
+#delete-device-btn.hidden { display: none; }
 
 
 /* Адаптивність */
-/* Планшети */
 @media (min-width: 600px) {
-    .container {
-        padding: 30px;
-    }
-    .device-list-container {
-        /* Дві колонки на планшетах */
-        grid-template-columns: repeat(2, 1fr);
-    }
-    .controls {
-        flex-wrap: nowrap; /* Забороняємо перенос */
-    }
+    .container { padding: 25px; }
+    .device-list-container { grid-template-columns: repeat(2, 1fr); }
+    .controls { flex-wrap: nowrap; }
+    .app-header h1 { font-size: 1.4em; }
+    .button { font-size: 0.95em; padding: 9px 18px; }
+    .segmented-control .filter-btn { padding: 7px 14px; font-size: 0.95em;}
+    .modal-content { padding: 25px 30px; }
+    #modal h2 { font-size: 1.3em; }
 }
 
-/* Невеликі десктопи */
 @media (min-width: 992px) {
-    .container {
-        padding: 40px;
-    }
-    .device-list-container {
-        /* Три колонки на десктопах */
-        grid-template-columns: repeat(3, 1fr);
-    }
+    .container { padding: 30px 40px; }
+    .device-list-container { grid-template-columns: repeat(3, 1fr); gap: 20px;}
+    .app-header h1 { font-size: 1.5em; }
+    .device-card { padding: 20px; }
+    .device-card p { font-size: 0.9em; }
+    .device-card strong { width: 110px; }
 }
 
-/* Великі десктопи */
 @media (min-width: 1200px) {
-     .device-list-container {
-        /* Можна додати 4 колонки, якщо вміст компактний */
-        /* grid-template-columns: repeat(4, 1fr); */
-    }
+     /* Можна додати 4 колонки, якщо потрібно */
+     /* .device-list-container { grid-template-columns: repeat(4, 1fr); } */
 }
