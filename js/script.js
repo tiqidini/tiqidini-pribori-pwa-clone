@@ -183,14 +183,6 @@ function sortDevices(devicesToSort) {
     });
 }
 
-function updateOverdueStats() {
-    const overdueCount = currentDevices.filter(device => {
-        const status = getNextCheckDateStatus(device.nextCheckDate);
-        return status.class === 'date-expired';
-    }).length;
-    overdueCountElement.textContent = overdueCount;
-}
-
 function renderDeviceList() {
     deviceListContainer.innerHTML = '';
     loadingPlaceholder?.remove();
@@ -334,7 +326,6 @@ deviceForm.addEventListener('submit', (event) => {
     }
 
     saveData();
-    updateOverdueStats();
     renderDeviceList();
     closeModal();
 });
@@ -352,7 +343,6 @@ deleteDeviceBtn.addEventListener('click', () => {
         if (currentDevices.length < initialLength) {
             saveData();
             console.log("Прилад видалено з ID:", id);
-            updateOverdueStats();
             renderDeviceList();
             closeModal();
         } else {
@@ -385,7 +375,6 @@ document.addEventListener('DOMContentLoaded', () => {
     currentDevices = loadData();
     console.log(`Завантажено ${currentDevices.length} приладів.`);
     
-    updateOverdueStats(currentDevices);
     renderDeviceList(currentDevices, currentRMFilter);
     initUIHandlers(currentDevices, currentRMFilter);
     initNotifications(currentDevices);
