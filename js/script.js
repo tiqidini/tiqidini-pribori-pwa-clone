@@ -162,54 +162,6 @@ function saveData() {
     }
 }
 
-function loadData() {
-    let loadedData = null;
-    try {
-        const savedData = localStorage.getItem(STORAGE_KEY);
-        if (savedData) {
-            const parsedData = JSON.parse(savedData);
-            if (Array.isArray(parsedData)) {
-                loadedData = parsedData;
-                console.log("Дані завантажено з localStorage.");
-            } else {
-                 console.warn("Збережені дані в localStorage мають невірний формат.");
-            }
-        }
-    } catch (e) {
-        console.error("Помилка завантаження або парсингу даних з localStorage:", e);
-        localStorage.removeItem(STORAGE_KEY);
-    }
-
-    if (!loadedData) {
-        if (typeof devices !== 'undefined' && Array.isArray(devices)) {
-            loadedData = JSON.parse(JSON.stringify(devices));
-            console.log("Використовуються початкові дані з data.js.");
-        } else {
-            console.error("Початкові дані 'devices' не знайдено або мають невірний формат.");
-            loadedData = [];
-        }
-    }
-
-    // Переконуємося, що всі об'єкти мають поле povirkyLocation та перераховуємо дати
-    loadedData.forEach(device => {
-        // Перейменовуємо старе поле, якщо воно є
-        if (device.calibrationLocation !== undefined) {
-            device.povirkyLocation = device.calibrationLocation;
-            delete device.calibrationLocation;
-        }
-        // Додаємо нове поле, якщо його немає
-        if (device.povirkyLocation === undefined) {
-            device.povirkyLocation = null;
-        }
-        // Перераховуємо дату наступної повірки
-        device.nextCheckDate = calculateNextCheckDate(device.lastCheckDate, device.mpi);
-    });
-
-    currentDevices = loadedData;
-    updateOverdueStats();
-}
-
-
 // --- Рендеринг, Сортування та Статистика ---
 
 function sortDevices(devicesToSort) {
