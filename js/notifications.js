@@ -1,7 +1,7 @@
 import { isNumeric } from './utils.js';
 
 // Функция проверки необходимости поверки
-function checkCalibrationNeeded(device) {
+export function checkCalibrationNeeded(device) {
     if (!device.lastCheckDate || !device.mpi) return false;
     
     const lastCheck = new Date(device.lastCheckDate);
