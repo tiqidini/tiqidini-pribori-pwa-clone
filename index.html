@@ -10,6 +10,7 @@
     <link rel="apple-touch-icon" href="img/icon-192x192.png">
     <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
 </head>
 <body>
@@ -47,6 +48,8 @@
             Показано: <span id="device-count">0</span> прилад(ів)
         </div>
 
+        <div id="notification-area" class="notification-area">
+            </div>
         <div id="device-list" class="device-list-container">
             <div class="loading-placeholder">Завантаження приладів...</div>
         </div>
@@ -124,19 +127,51 @@
         </div>
     </div>
 
-    <script type="module" src="js/data.js"></script>
+    <script type="module" src="js/storage.js"></script>
+    <script type="module" src="js/utils.js"></script>
+    <script type="module" src="js/ui.js"></script>
+    <script type="module" src="js/notifications.js"></script>
     <script type="module" src="js/script.js"></script>
+
     <script>
         // Реєстрація Service Worker
         if ('serviceWorker' in navigator) {
+            // --- ВИПРАВЛЕНО ---
+            // Використовуємо відносний шлях для Service Worker
             const swPath = 'service-worker.js';
-            navigator.serviceWorker.register(swPath)
+            // Використовуємо відносний шлях для scope
+            const swScope = './';
+            // --- КІНЕЦЬ ВИПРАВЛЕННЯ ---
+
+            console.log(`Registering Service Worker at: ${swPath} with scope: ${swScope}`);
+
+            navigator.serviceWorker.register(swPath, { scope: swScope }) // Використовуємо визначені шляхи
             .then(registration => {
                 console.log('Service Worker зареєстровано:', registration.scope);
+
+                // Обробка оновлень SW
+                registration.onupdatefound = () => {
+                    const installingWorker = registration.installing;
+                    if (installingWorker) {
+                        installingWorker.onstatechange = () => {
+                            if (installingWorker.state === 'installed') {
+                                if (navigator.serviceWorker.controller) {
+                                    // Новий контент доступний, можна повідомити користувача
+                                    console.log('Новий Service Worker встановлено. Оновіть сторінку для застосування.');
+                                    // Тут можна показати кнопку "Оновити"
+                                } else {
+                                    console.log('Контент кешовано для офлайн використання.');
+                                }
+                            }
+                        };
+                    }
+                };
             })
             .catch(error => {
                 console.error('Помилка реєстрації Service Worker:', error);
             });
+        } else {
+             console.log('Service Worker не підтримується цим браузером.');
         }
     </script>
 </body>

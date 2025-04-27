@@ -5,44 +5,54 @@
 :root {
     --primary-color: #3a86ff;
     --primary-hover-color: #3173dc;
-    --secondary-color: #f0f4f8;
+    --secondary-color: #f0f4f8; /* Світліший фон */
     --text-color: #1c3144;
     --text-secondary-color: #6c757d;
     --card-bg: #ffffff;
     --shadow-color-light: rgba(58, 134, 255, 0.1);
     --shadow-color-medium: rgba(58, 134, 255, 0.15);
-    --border-color: #d1d9e6;
+    --border-color: #d1d9e6; /* Трохи темніша рамка */
+
+    /* Кольори для дат */
     --warning-bg: #fff3cd;
     --warning-border: #ffeeba;
     --warning-text: #856404;
-    --warning-scale-color: #ffc107;
+    --warning-scale-color: #ffc107; /* Жовтий */
+
     --expired-bg: #f8d7da;
     --expired-border: #f5c6cb;
     --expired-text: #721c24;
-    --expired-scale-color: #dc3545;
-    --ok-scale-color: #28a745;
+    --expired-scale-color: #dc3545; /* Червоний */
+
+    --ok-scale-color: #28a745; /* Зелений */
+
+    /* Кольори для кнопок */
     --danger-color: #e76f51;
     --danger-hover-color: #d75a3b;
-    --type-color: #0077b6;
+
+    /* Інші */
+    --type-color: #0077b6; /* Синій для типу */
     --border-radius: 8px;
     --border-radius-small: 5px;
-    /* Системний шрифт з Calibri */
+
+    /* Шрифти */
     --font-family-base: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
     --font-family-fallback: 'Carlito', sans-serif; /* Fallback, якщо Calibri немає */
+
+    /* Кольори для сповіщень */
+    --notification-warning-bg: #fff8e1; /* Світло-жовтий фон */
+    --notification-warning-border: #ffc107; /* Жовта рамка */
+    --notification-warning-text: #664d03; /* Темно-жовтий текст */
+    --notification-warning-icon: #ffc107; /* Жовта іконка */
 }
 
 /* Загальні стилі */
 body {
-    /* Спочатку спробуємо системний стек */
-    font-family: var(--font-family-base);
-    /* Якщо Calibri немає, браузер спробує наступні,
-       але ми також можемо додати Carlito як веб-шрифт */
-    /* Якщо ви хочете гарантовано схожий шрифт, розкоментуйте наступний рядок */
-    /* font-family: var(--font-family-fallback); */
+    font-family: var(--font-family-base), var(--font-family-fallback); /* Спочатку системний, потім fallback */
     margin: 0;
     background-color: var(--secondary-color);
     color: var(--text-color);
-    line-height: 1.5; /* Зменшив для Calibri */
+    line-height: 1.5;
 }
 
 .container {
@@ -139,7 +149,7 @@ body {
     transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
     white-space: nowrap;
-    font-family: inherit; /* Наслідуємо основний шрифт */
+    font-family: inherit;
 }
 .button svg { vertical-align: middle; }
 .button-primary { background-color: var(--primary-color); color: white; }
@@ -149,11 +159,104 @@ body {
 .button:active { transform: scale(0.97); }
 
 /* Лічильник приладів */
-.device-count-container { text-align: right; margin-bottom: 15px; color: var(--text-secondary-color); font-size: 0.9em; }
+.device-count-container { text-align: right; margin-bottom: 10px; color: var(--text-secondary-color); font-size: 0.9em; }
+
+/* --- СТИЛІ СПОВІЩЕНЬ --- */
+.notification-area {
+    margin-bottom: 15px; /* Відступ від списку приладів */
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Відстань між сповіщеннями */
+}
+
+.notification {
+    display: flex;
+    align-items: flex-start; /* Вирівнювання по верху для багаторядкового тексту */
+    padding: 12px 15px;
+    border-radius: var(--border-radius-small);
+    border: 1px solid transparent;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    opacity: 1;
+    transform: translateX(0);
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+/* Стиль для сповіщень про повірку (warning) */
+.notification-warning {
+    background-color: var(--notification-warning-bg);
+    border-left: 5px solid var(--notification-warning-border); /* Акцентний лівий бордер */
+    color: var(--notification-warning-text);
+}
+
+.notification-icon {
+    margin-right: 12px;
+    font-size: 1.3em; /* Розмір іконки */
+    flex-shrink: 0;
+    padding-top: 2px; /* Невелике вирівнювання іконки */
+}
+.notification-warning .notification-icon i {
+    color: var(--notification-warning-icon);
+}
+
+.notification-content {
+    flex-grow: 1; /* Займає доступний простір */
+    font-size: 0.9em;
+    line-height: 1.4;
+}
+.notification-content strong {
+    font-weight: 600;
+}
+
+.notification-close-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary-color);
+    font-size: 1.1em;
+    cursor: pointer;
+    padding: 0 0 0 10px; /* Відступ зліва */
+    margin-left: auto; /* Притискає кнопку вправо */
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+    align-self: center; /* Центрування кнопки по вертикалі */
+}
+.notification-close-btn:hover {
+    opacity: 1;
+    color: var(--text-color);
+}
+
+/* Анімації появи/зникнення */
+@keyframes slideInAnimation {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+@keyframes slideOutAnimation {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+}
+
+.slide-in {
+    animation: slideInAnimation 0.3s ease-out forwards;
+}
+.slide-out {
+    animation: slideOutAnimation 0.3s ease-out forwards;
+}
+/* --- КІНЕЦЬ СТИЛІВ СПОВІЩЕНЬ --- */
 
 /* Список карточек */
 .device-list-container { display: grid; grid-template-columns: 1fr; gap: 15px; }
-.loading-placeholder, .no-devices { text-align: center; padding: 40px; color: var(--text-secondary-color); font-size: 1.1em; grid-column: 1 / -1; }
+.loading-placeholder, .no-devices { text-align: center; padding: 40px; color: var(--text-secondary-color); font-size: 1.1em; grid-column: 1 / -1; background-color: var(--card-bg); border-radius: var(--border-radius); box-shadow: 0 2px 4px var(--shadow-color-light); }
 
 .device-card {
     background-color: var(--card-bg);
@@ -172,23 +275,20 @@ body {
 
 .device-card h3 {
     margin-top: 0;
-    margin-bottom: 2px; /* Зменшив відступ */
+    margin-bottom: 2px;
     font-size: 1.05em;
     color: var(--text-color);
-    font-weight: 500; /* Зробив трохи жирнішим */
+    font-weight: 500;
     line-height: 1.3;
 }
-
-/* Тип приладу з нового рядка */
 .device-type-container {
     font-size: 0.9em;
     color: var(--type-color);
     font-weight: 700;
-    margin-bottom: 8px; /* Відступ після типу */
+    margin-bottom: 8px;
 }
-
 .device-card p {
-    margin: 3px 0; /* Ще зменшив */
+    margin: 3px 0;
     font-size: 0.85em;
     color: #495057;
     display: flex;
@@ -218,43 +318,39 @@ body {
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: hidden; /* Забороняємо скрол самого вікна */
+    overflow: hidden;
     background-color: rgba(28, 49, 68, 0.6);
-    padding: 15px; /* Відступи безпечної зони */
+    padding: 15px;
     box-sizing: border-box;
 }
-
-/* Обгортка для центрування та скролу */
 .modal-outer {
     width: 100%;
     height: 100%;
     display: flex;
-    align-items: center; /* Центрування по вертикалі */
-    justify-content: center; /* Центрування по горизонталі */
+    align-items: center;
+    justify-content: center;
 }
-
 .modal-content {
     background-color: #fefefe;
     padding: 20px 25px;
     border: none;
     border-radius: var(--border-radius);
-    width: 100%; /* Ширина відносно батька (.modal-outer) */
-    max-width: 500px; /* Максимальна ширина */
-    max-height: 90vh; /* Максимальна висота - 90% висоти екрану */
-    overflow-y: auto; /* Додаємо вертикальний скрол, якщо вміст не влазить */
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-    position: relative; /* Для позиціонування кнопки закриття */
+    position: relative;
     animation: fadeInScale 0.3s ease-out;
     box-sizing: border-box;
 }
-
 @keyframes fadeInScale { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
 .close-btn {
     color: #aaa;
     background: none;
     border: none;
-    position: absolute; /* Позиціонуємо відносно .modal-content */
+    position: absolute;
     top: 8px;
     right: 10px;
     font-size: 26px;
@@ -263,7 +359,7 @@ body {
     cursor: pointer;
     padding: 5px;
     transition: color 0.2s ease;
-    z-index: 10; /* Щоб була над контентом */
+    z-index: 10;
 }
 .close-btn:hover, .close-btn:focus { color: #333; outline: none; }
 
@@ -282,7 +378,7 @@ body {
     font-size: 0.95em;
     box-sizing: border-box;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    font-family: inherit; /* Наслідуємо шрифт */
+    font-family: inherit;
 }
 #device-form input:focus, #device-form textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px var(--shadow-color-light); }
 #device-form textarea { resize: vertical; min-height: 70px; }
