@@ -1,5 +1,6 @@
 /* Системний стек шрифтів з Calibri */
 @import url('https://fonts.googleapis.com/css2?family=Carlito&display=swap'); /* Carlito як fallback для Calibri */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap');
 
 /* Базові змінні */
 :root {
@@ -36,7 +37,7 @@
     --border-radius-small: 5px;
 
     /* Шрифти */
-    --font-family-base: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
+    --font-family-base: 'Noto Sans', sans-serif;
     --font-family-fallback: 'Carlito', sans-serif; /* Fallback, якщо Calibri немає */
 
     /* Кольори для сповіщень */
@@ -48,11 +49,14 @@
 
 /* Загальні стилі */
 body {
-    font-family: var(--font-family-base), var(--font-family-fallback); /* Спочатку системний, потім fallback */
+    font-family: var(--font-family-base);
     margin: 0;
+    padding: 0;
     background-color: var(--secondary-color);
     color: var(--text-color);
-    line-height: 1.5;
+    line-height: 1.6;
+    padding-top: 70px; /* Додаємо відступ зверху через фіксований хедер */
+    padding-bottom: 20px;
 }
 
 .container {
@@ -385,6 +389,19 @@ body {
 .form-buttons { display: flex; justify-content: space-between; margin-top: 20px; gap: 10px; }
 #device-form button { flex-grow: 1; padding: 10px 15px; }
 #delete-device-btn.hidden { display: none; }
+
+/* Застосуємо шрифт до інших елементів для консистентності */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-family-base);
+    color: var(--primary-color);
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+}
+
+button, input, select, textarea {
+    font-family: inherit; /* Успадковуємо шрифт від body */
+    font-size: 1rem;
+}
 
 /* Адаптивність */
 @media (min-width: 600px) {
