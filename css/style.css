@@ -1,5 +1,5 @@
-/* --- ИЗМЕНЕНО: Импортируем шрифт Inter --- */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+/* --- ИЗМЕНЕНО: Убираем импорт внешних шрифтов --- */
+/* @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap'); */
 
 /* Базові змінні */
 :root {
@@ -35,8 +35,9 @@
     --border-radius: 8px;
     --border-radius-small: 5px;
 
-    /* --- ИЗМЕНЕНО: Задаем новый шрифт --- */
-    --font-family-base: 'Inter', sans-serif;
+    /* --- ИЗМЕНЕНО: Задаем системный шрифт --- */
+    /* Пытаемся использовать Calibri, если он есть, иначе стандартные системные шрифты */
+    --font-family-base: Calibri, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 
     /* Кольори для сповіщень */
     --notification-warning-bg: #fff8e1; /* Світло-жовтий фон */
@@ -47,15 +48,13 @@
 
 /* Загальні стилі */
 body {
-    /* --- ИЗМЕНЕНО: Устанавливаем новый шрифт для body --- */
+    /* --- ИЗМЕНЕНО: Устанавливаем системный шрифт --- */
     font-family: var(--font-family-base);
     margin: 0;
-    padding: 0;
+    padding: 0; /* --- ИЗМЕНЕНО: Убираем padding-top --- */
     background-color: var(--secondary-color);
     color: var(--text-color);
     line-height: 1.6;
-    /* --- ИЗМЕНЕНО: Немного увеличим отступ сверху, если шапка стала выше --- */
-    padding-top: 75px; /* Было 70px */
     padding-bottom: 20px;
 }
 
@@ -63,22 +62,23 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 15px;
+    /* --- ДОБАВЛЕНО: Отступ сверху, чтобы контент не заходил под шапку --- */
+    /* Рассчитываем примерно: высота шапки + отступ шапки снизу */
+    margin-top: calc(60px + 20px); /* min-height шапки + margin-bottom шапки */
 }
 
 /* Шапка */
 .app-header {
     background: linear-gradient(135deg, var(--primary-color) 0%, #5a9fff 100%);
     color: white;
-    /* --- ИЗМЕНЕНО: Увеличим вертикальный padding для заголовка --- */
-    padding: 15px 15px; /* Было 12px 15px */
+    padding: 15px 15px;
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
+    margin-bottom: 20px; /* Отступ под шапкой */
     position: sticky;
     top: 0;
     z-index: 100;
-    /* --- ДОБАВЛЕНО: Убедимся, что высота достаточна --- */
     min-height: 60px; /* Минимальная высота шапки */
-    box-sizing: border-box; /* Учитываем padding в высоте */
+    box-sizing: border-box;
 }
 .header-content {
     display: flex;
@@ -87,13 +87,12 @@ body {
     max-width: 1200px;
     margin: 0 auto;
 }
-/* --- ИЗМЕНЕНО: Уберем лишние отступы у h1 и зададим line-height --- */
 .app-header h1 {
     margin: 0;
     font-size: 1.3em;
     font-weight: 500;
-    line-height: 1.2; /* Добавлено для контроля высоты строки */
-    color: white; /* Явно зададим цвет, т.к. он теперь не наследуется от body */
+    line-height: 1.2;
+    color: white;
 }
 .stats-container {
     display: flex;
@@ -178,15 +177,15 @@ body {
 
 /* --- СТИЛІ СПОВІЩЕНЬ --- */
 .notification-area {
-    margin-bottom: 15px; /* Відступ від списку приладів */
+    margin-bottom: 15px;
     display: flex;
     flex-direction: column;
-    gap: 10px; /* Відстань між сповіщеннями */
+    gap: 10px;
 }
 
 .notification {
     display: flex;
-    align-items: flex-start; /* Вирівнювання по верху для багаторядкового тексту */
+    align-items: flex-start;
     padding: 12px 15px;
     border-radius: var(--border-radius-small);
     border: 1px solid transparent;
@@ -196,30 +195,29 @@ body {
     transition: opacity 0.3s ease-out, transform 0.3s ease-out;
 }
 
-/* Стиль для сповіщень про повірку (warning) */
 .notification-warning {
     background-color: var(--notification-warning-bg);
-    border-left: 5px solid var(--notification-warning-border); /* Акцентний лівий бордер */
+    border-left: 5px solid var(--notification-warning-border);
     color: var(--notification-warning-text);
 }
 
 .notification-icon {
     margin-right: 12px;
-    font-size: 1.3em; /* Розмір іконки */
+    font-size: 1.3em;
     flex-shrink: 0;
-    padding-top: 2px; /* Невелике вирівнювання іконки */
+    padding-top: 2px;
 }
 .notification-warning .notification-icon i {
     color: var(--notification-warning-icon);
 }
 
 .notification-content {
-    flex-grow: 1; /* Займає доступний простір */
+    flex-grow: 1;
     font-size: 0.9em;
     line-height: 1.4;
 }
 .notification-content strong {
-    font-weight: 600; /* --- ИЗМЕНЕНО: Используем 600 вместо 700 для Inter --- */
+    font-weight: 600;
 }
 
 .notification-close-btn {
@@ -228,45 +226,28 @@ body {
     color: var(--text-secondary-color);
     font-size: 1.1em;
     cursor: pointer;
-    padding: 0 0 0 10px; /* Відступ зліва */
-    margin-left: auto; /* Притискає кнопку вправо */
+    padding: 0 0 0 10px;
+    margin-left: auto;
     opacity: 0.7;
     transition: opacity 0.2s ease;
-    align-self: center; /* Центрування кнопки по вертикалі */
+    align-self: center;
 }
 .notification-close-btn:hover {
     opacity: 1;
     color: var(--text-color);
 }
 
-/* Анімації появи/зникнення */
 @keyframes slideInAnimation {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 @keyframes slideOutAnimation {
-    from {
-        opacity: 1;
-        transform: scale(1);
-    }
-    to {
-        opacity: 0;
-        transform: scale(0.95);
-    }
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(0.95); }
 }
 
-.slide-in {
-    animation: slideInAnimation 0.3s ease-out forwards;
-}
-.slide-out {
-    animation: slideOutAnimation 0.3s ease-out forwards;
-}
+.slide-in { animation: slideInAnimation 0.3s ease-out forwards; }
+.slide-out { animation: slideOutAnimation 0.3s ease-out forwards; }
 /* --- КІНЕЦЬ СТИЛІВ СПОВІЩЕНЬ --- */
 
 /* Список карточек */
@@ -292,7 +273,6 @@ body {
     margin-top: 0;
     margin-bottom: 2px;
     font-size: 1.05em;
-    /* --- ИЗМЕНЕНО: Устанавливаем цвет явно --- */
     color: var(--text-color);
     font-weight: 500;
     line-height: 1.3;
@@ -300,7 +280,6 @@ body {
 .device-type-container {
     font-size: 0.9em;
     color: var(--type-color);
-    /* --- ИЗМЕНЕНО: Используем 600 вместо 700 для Inter --- */
     font-weight: 600;
     margin-bottom: 8px;
 }
@@ -403,17 +382,14 @@ body {
 #device-form button { flex-grow: 1; padding: 10px 15px; }
 #delete-device-btn.hidden { display: none; }
 
-/* --- ИЗМЕНЕНО: Убедимся, что заголовки тоже используют новый шрифт --- */
 h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-family-base);
-    /* --- ИЗМЕНЕНО: Уберем цвет по умолчанию, чтобы h1 в шапке остался белым --- */
-    /* color: var(--primary-color); */
     margin-top: 0;
     margin-bottom: 0.75rem;
 }
 
 button, input, select, textarea {
-    font-family: inherit; /* Успадковуємо шрифт від body */
+    font-family: inherit;
     font-size: 1rem;
 }
 
