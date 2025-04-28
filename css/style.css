@@ -49,7 +49,7 @@ body {
     padding: 0;
     background-color: var(--secondary-color);
     color: var(--text-color);
-    line-height: 1.6;
+    line-height: 1.6; /* Базовый line-height для основного текста */
     padding-bottom: 20px;
 }
 
@@ -277,22 +277,21 @@ body {
     font-weight: 600;
 }
 .card-details p {
-    /* --- ИЗМЕНЕНО: Убираем margin и уменьшаем line-height и font-size --- */
-    margin: 0; /* Убираем вертикальные отступы */
-    font-size: 0.8em; /* Уменьшаем шрифт */
+    /* --- ИЗМЕНЕНО: Еще уменьшаем шрифт и line-height, убираем padding-bottom --- */
+    margin: 0;
+    font-size: 0.75em; /* Еще меньше шрифт */
     color: #495057;
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
     word-break: break-word;
-    line-height: 1.3; /* Уменьшаем межстрочный интервал */
-    /* --- ДОБАВЛЕНО: Небольшой отступ снизу для разделения строк --- */
-    padding-bottom: 2px;
+    line-height: 1.25; /* Еще меньше межстрочный интервал */
+    padding-bottom: 0; /* Убираем нижний паддинг */
 }
 .card-details strong {
     color: var(--text-color);
     font-weight: 500;
-    margin-right: 6px;
+    margin-right: 4px; /* Немного уменьшим отступ справа */
     flex-shrink: 0;
 }
 .card-details span {
@@ -307,10 +306,11 @@ body {
     padding-top: 8px;
 }
 .card-notes p {
-    margin: 0; /* Убираем margin */
-    font-size: 0.8em; /* Уменьшаем шрифт */
-    line-height: 1.3; /* Уменьшаем межстрочный интервал */
-    padding-bottom: 2px;
+    /* --- ИЗМЕНЕНО: Применяем те же стили, что и для .card-details p --- */
+    margin: 0;
+    font-size: 0.75em;
+    line-height: 1.25;
+    padding-bottom: 0;
 }
 
 /* Шкала повірки */
@@ -428,8 +428,8 @@ button, input, select, textarea {
     .device-list-container { grid-template-columns: repeat(3, 1fr); gap: 20px;}
     .app-header h1 { font-size: 1.5em; }
     .device-card { padding: 20px; }
-    /* --- ИЗМЕНЕНО: Возвращаем размер шрифта, но оставляем line-height и margin --- */
-    .card-details p { font-size: 0.9em; flex-wrap: nowrap; line-height: 1.3; margin: 0; padding-bottom: 2px; }
-    .card-notes p { font-size: 0.9em; line-height: 1.3; margin: 0; padding-bottom: 2px; }
+    /* --- ИЗМЕНЕНО: Возвращаем размер шрифта 0.9em, но оставляем line-height и margin 0 --- */
+    .card-details p { font-size: 0.9em; flex-wrap: nowrap; line-height: 1.25; margin: 0; padding-bottom: 0; }
+    .card-notes p { font-size: 0.9em; line-height: 1.25; margin: 0; padding-bottom: 0; }
     .card-details span { min-width: 0; }
 }
