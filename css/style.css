@@ -1,6 +1,5 @@
-/* Системний стек шрифтів з Calibri */
-@import url('https://fonts.googleapis.com/css2?family=Carlito&display=swap'); /* Carlito як fallback для Calibri */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap');
+/* --- ИЗМЕНЕНО: Импортируем шрифт Inter --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
 
 /* Базові змінні */
 :root {
@@ -36,9 +35,8 @@
     --border-radius: 8px;
     --border-radius-small: 5px;
 
-    /* Шрифти */
-    --font-family-base: 'Noto Sans', sans-serif;
-    --font-family-fallback: 'Carlito', sans-serif; /* Fallback, якщо Calibri немає */
+    /* --- ИЗМЕНЕНО: Задаем новый шрифт --- */
+    --font-family-base: 'Inter', sans-serif;
 
     /* Кольори для сповіщень */
     --notification-warning-bg: #fff8e1; /* Світло-жовтий фон */
@@ -49,13 +47,15 @@
 
 /* Загальні стилі */
 body {
+    /* --- ИЗМЕНЕНО: Устанавливаем новый шрифт для body --- */
     font-family: var(--font-family-base);
     margin: 0;
     padding: 0;
     background-color: var(--secondary-color);
     color: var(--text-color);
     line-height: 1.6;
-    padding-top: 70px; /* Додаємо відступ зверху через фіксований хедер */
+    /* --- ИЗМЕНЕНО: Немного увеличим отступ сверху, если шапка стала выше --- */
+    padding-top: 75px; /* Было 70px */
     padding-bottom: 20px;
 }
 
@@ -69,12 +69,16 @@ body {
 .app-header {
     background: linear-gradient(135deg, var(--primary-color) 0%, #5a9fff 100%);
     color: white;
-    padding: 12px 15px;
+    /* --- ИЗМЕНЕНО: Увеличим вертикальный padding для заголовка --- */
+    padding: 15px 15px; /* Было 12px 15px */
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
     position: sticky;
     top: 0;
     z-index: 100;
+    /* --- ДОБАВЛЕНО: Убедимся, что высота достаточна --- */
+    min-height: 60px; /* Минимальная высота шапки */
+    box-sizing: border-box; /* Учитываем padding в высоте */
 }
 .header-content {
     display: flex;
@@ -83,7 +87,14 @@ body {
     max-width: 1200px;
     margin: 0 auto;
 }
-.app-header h1 { margin: 0; font-size: 1.3em; font-weight: 500; }
+/* --- ИЗМЕНЕНО: Уберем лишние отступы у h1 и зададим line-height --- */
+.app-header h1 {
+    margin: 0;
+    font-size: 1.3em;
+    font-weight: 500;
+    line-height: 1.2; /* Добавлено для контроля высоты строки */
+    color: white; /* Явно зададим цвет, т.к. он теперь не наследуется от body */
+}
 .stats-container {
     display: flex;
     align-items: center;
@@ -208,7 +219,7 @@ body {
     line-height: 1.4;
 }
 .notification-content strong {
-    font-weight: 600;
+    font-weight: 600; /* --- ИЗМЕНЕНО: Используем 600 вместо 700 для Inter --- */
 }
 
 .notification-close-btn {
@@ -281,6 +292,7 @@ body {
     margin-top: 0;
     margin-bottom: 2px;
     font-size: 1.05em;
+    /* --- ИЗМЕНЕНО: Устанавливаем цвет явно --- */
     color: var(--text-color);
     font-weight: 500;
     line-height: 1.3;
@@ -288,7 +300,8 @@ body {
 .device-type-container {
     font-size: 0.9em;
     color: var(--type-color);
-    font-weight: 700;
+    /* --- ИЗМЕНЕНО: Используем 600 вместо 700 для Inter --- */
+    font-weight: 600;
     margin-bottom: 8px;
 }
 .device-card p {
@@ -390,10 +403,11 @@ body {
 #device-form button { flex-grow: 1; padding: 10px 15px; }
 #delete-device-btn.hidden { display: none; }
 
-/* Застосуємо шрифт до інших елементів для консистентності */
+/* --- ИЗМЕНЕНО: Убедимся, что заголовки тоже используют новый шрифт --- */
 h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-family-base);
-    color: var(--primary-color);
+    /* --- ИЗМЕНЕНО: Уберем цвет по умолчанию, чтобы h1 в шапке остался белым --- */
+    /* color: var(--primary-color); */
     margin-top: 0;
     margin-bottom: 0.75rem;
 }
