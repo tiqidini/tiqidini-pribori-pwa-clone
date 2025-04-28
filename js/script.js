@@ -1,8 +1,9 @@
 // Імпортуємо необхідні модулі та функції
-import { loadData, saveData } from './storage.js';
+// import { loadData, saveData } from './storage.js'; // Видалено
+import { initDB, getAllDevices, saveDevice, deleteDevice } from './database.js'; // Додано
 import { updateOverdueStats, renderDeviceList, openModal, closeModal, initUIHandlers } from './ui.js';
-import { initNotifications, showNotifications } from './notifications.js'; // Додано showNotifications
-import { calculateNextCheckDate } from './utils.js'; // Імпортуємо для розрахунку
+import { initNotifications, showNotifications } from './notifications.js';
+import { calculateNextCheckDate } from './utils.js';
 
 // --- Глобальні змінні ---
 let currentDevices = [];
@@ -18,60 +19,80 @@ const rmFilterContainer = document.getElementById('rm-filter');
 function updateUI() {
     renderDeviceList(currentDevices, currentRMFilter);
     updateOverdueStats(currentDevices);
-    showNotifications(currentDevices); // Оновлюємо сповіщення
+    showNotifications(currentDevices);
 }
 
-// --- Функції для роботи з даними ---
+// --- Функції для роботи з даними (використовують database.js) ---
 
 // Функція для збереження/оновлення приладу
-function handleSaveDevice(formData, id) {
+async function handleSaveDevice(formData, id) {
     console.log("handleSaveDevice called with ID:", id, "and data:", formData);
     const isEditing = !!id;
 
-    // Перераховуємо дату наступної перевірки
     formData.nextCheckDate = calculateNextCheckDate(formData.lastCheckDate, formData.mpi);
 
-    if (isEditing) {
-        // Оновлення
-        const index = currentDevices.findIndex(d => d.id === id);
-        if (index !== -1) {
-            currentDevices[index] = { ...formData, id: id }; // Оновлюємо в масиві
-            console.log("Device updated in currentDevices:", currentDevices[index]);
+    try {
+        // Створюємо об'єкт для збереження (переконуємося, що ID є, якщо редагуємо)
+        const deviceToSave = { ...formData };
+        if (isEditing) {
+            deviceToSave.id = id;
         } else {
-            console.error(`Error: Device with ID ${id} not found for update in currentDevices.`);
-            alert("Помилка: не вдалося знайти прилад для оновлення.");
-            return; // Зупиняємо, якщо не знайдено
+            // Генеруємо новий ID, якщо це новий прилад
+            let newId = (formData.serial || 'no_serial') + '_' + Date.now();
+            while (currentDevices.some(d => d.id === newId)) {
+                newId = (formData.serial || 'no_serial') + '_' + Date.now() + '_' + Math.random().toString(16).slice(2, 8);
+            }
+            deviceToSave.id = newId;
         }
-    } else {
-        // Додавання
-        let newId = (formData.serial || 'no_serial') + '_' + Date.now();
-        while (currentDevices.some(d => d.id === newId)) {
-            newId = (formData.serial || 'no_serial') + '_' + Date.now() + '_' + Math.random().toString(16).slice(2, 8);
-        }
-        formData.id = newId;
-        currentDevices.push(formData); // Додаємо до масиву
-        console.log("New device added to currentDevices:", formData);
-    }
 
-    saveData(currentDevices); // Зберігаємо оновлений масив
-    updateUI(); // Оновлюємо весь інтерфейс
-    closeModal(); // Закриваємо модальне вікно
+        await saveDevice(deviceToSave); // Зберігаємо в IndexedDB
+
+        // Оновлюємо локальний масив currentDevices ПІСЛЯ успішного збереження в БД
+        if (isEditing) {
+            const index = currentDevices.findIndex(d => d.id === id);
+            if (index !== -1) {
+                currentDevices[index] = deviceToSave;
+                console.log("Device updated in currentDevices array.");
+            } else {
+                 console.warn(`Device with ID ${id} was saved to DB, but not found in currentDevices array for update.`);
+                 // Можливо, варто перезавантажити дані з БД тут, але поки що оновимо UI
+            }
+        } else {
+            currentDevices.push(deviceToSave);
+            console.log("New device added to currentDevices array.");
+        }
+
+        updateUI(); // Оновлюємо весь інтерфейс
+        closeModal(); // Закриваємо модальне вікно
+
+    } catch (error) {
+        console.error("Failed to save device:", error);
+        alert("Помилка збереження приладу. Дивіться консоль.");
+    }
 }
 
 // Функція для видалення приладу
-function handleDeleteDevice(id) {
+async function handleDeleteDevice(id) {
     console.log(`handleDeleteDevice called with ID: ${id}`);
-    const initialLength = currentDevices.length;
-    currentDevices = currentDevices.filter(device => device.id !== id); // Створюємо новий масив без видаленого елемента
+    try {
+        await deleteDevice(id); // Видаляємо з IndexedDB
 
-    if (currentDevices.length < initialLength) {
-        saveData(currentDevices); // Зберігаємо зміни
-        console.log("Device deleted from currentDevices. ID:", id);
+        // Оновлюємо локальний масив currentDevices ПІСЛЯ успішного видалення з БД
+        const initialLength = currentDevices.length;
+        currentDevices = currentDevices.filter(device => device.id !== id);
+
+        if (currentDevices.length < initialLength) {
+             console.log("Device removed from currentDevices array.");
+        } else {
+             console.warn(`Device with ID ${id} was deleted from DB, but not found in currentDevices array.`);
+        }
+
         updateUI(); // Оновлюємо весь інтерфейс
         closeModal(); // Закриваємо модальне вікно
-    } else {
-        console.error(`Error: Device with ID ${id} not found for deletion in currentDevices.`);
-        alert("Помилка: не вдалося знайти прилад для видалення.");
+
+    } catch(error) {
+         console.error("Failed to delete device:", error);
+         alert("Помилка видалення приладу. Дивіться консоль.");
     }
 }
 
@@ -79,7 +100,7 @@ function handleDeleteDevice(id) {
 
 // Обробник кліку на кнопку "Додати"
 addDeviceBtn.addEventListener('click', () => {
-    openModal(null); // Відкриваємо модалку для додавання (передаємо null)
+    openModal(null); // Відкриваємо модалку для додавання
 });
 
 // Обробник фільтрації РМ
@@ -88,30 +109,43 @@ rmFilterContainer.addEventListener('click', (event) => {
         const selectedRM = event.target.dataset.rm;
         if (selectedRM !== currentRMFilter) {
             currentRMFilter = selectedRM;
-            // Оновлюємо активну кнопку
             rmFilterContainer.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.rm === currentRMFilter);
             });
-            // Перемальовуємо тільки список приладів з новим фільтром
-            renderDeviceList(currentDevices, currentRMFilter);
+            renderDeviceList(currentDevices, currentRMFilter); // Перемальовуємо список
         }
     }
 });
 
 // --- Початкове Завантаження ---
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("DOM завантажено. Завантаження даних...");
-    currentDevices = loadData(); // Завантажуємо дані
-    console.log(`Завантажено ${currentDevices.length} приладів.`);
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log("DOM завантажено. Ініціалізація IndexedDB...");
+    try {
+        await initDB(); // Спочатку ініціалізуємо БД
+        console.log("IndexedDB ініціалізовано. Завантаження даних...");
+        currentDevices = await getAllDevices(); // Потім завантажуємо дані
+        console.log(`Завантажено ${currentDevices.length} приладів з IndexedDB.`);
 
-    // Ініціалізуємо обробники UI, передаючи функції для збереження та видалення
-    initUIHandlers(handleSaveDevice, handleDeleteDevice);
+        // Ініціалізуємо обробники UI, передаючи асинхронні функції
+        initUIHandlers(handleSaveDevice, handleDeleteDevice);
 
-    // Ініціалізуємо та показуємо сповіщення
-    initNotifications(currentDevices); // Передаємо актуальний масив
+        // Ініціалізуємо та показуємо сповіщення
+        initNotifications(currentDevices);
 
-    // Перший рендеринг UI
-    updateUI();
+        // Перший рендеринг UI
+        updateUI();
 
-    console.log("Application initialized.");
+        console.log("Application initialized with IndexedDB.");
+
+    } catch (error) {
+        console.error("Помилка ініціалізації програми:", error);
+        // Можна показати повідомлення користувачу про помилку завантаження
+        const listContainer = document.getElementById('device-list');
+        if (listContainer) {
+            listContainer.innerHTML = '<p class="error-message">Не вдалося завантажити дані. Перевірте консоль для деталей.</p>';
+        }
+        // Прибираємо плейсхолдер завантаження, якщо він є
+        const loadingPlaceholder = document.querySelector('.loading-placeholder');
+        loadingPlaceholder?.remove();
+    }
 });
