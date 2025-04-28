@@ -1,9 +1,11 @@
-// Імпортуємо необхідні модулі та функції
+// Импортуємо необхідні модулі та функції
 // import { loadData, saveData } from './storage.js'; // Видалено
 import { initDB, getAllDevices, saveDevice, deleteDevice } from './database.js'; // Додано
 import { updateOverdueStats, renderDeviceList, openModal, closeModal, initUIHandlers } from './ui.js';
 import { initNotifications, showNotifications } from './notifications.js';
-import { calculateNextCheckDate, formatDateForInput } from './utils.js'; // Додано formatDateForInput
+// --- ИСПРАВЛЕНО: Импортируем 'formatDate' вместо 'formatDateForInput' ---
+import { calculateNextCheckDate, formatDate } from './utils.js';
+// --- КОНЕЦ ИСПРАВЛЕНИЯ ---
 
 // --- Глобальні змінні ---
 let currentDevices = [];
@@ -29,21 +31,27 @@ async function handleSaveDevice(formData, id) {
     console.log("handleSaveDevice called with ID:", id, "and data:", formData);
     const isEditing = !!id;
 
-    formData.nextCheckDate = calculateNextCheckDate(formData.lastCheckDate, formData.mpi);
+    // Рассчитываем дату следующей поверки перед сохранением
+    // Примечание: calculateNextCheckDate возвращает строку 'YYYY-MM-DD' или null
+    const nextCheckDateString = calculateNextCheckDate(formData.lastCheckDate, formData.mpi);
 
     try {
-        // Створюємо об'єкт для збереження (переконуємося, що ID є, якщо редагуємо)
+        // Создаем объект для сохранения
         const deviceToSave = { ...formData };
         if (isEditing) {
             deviceToSave.id = id;
         } else {
-            // Генеруємо новий ID, якщо це новий прилад
+            // Генерируем новый ID, если это новый прилад
             let newId = (formData.serial || 'no_serial') + '_' + Date.now();
+            // Проверяем уникальность ID (хотя Date.now() почти всегда уникален)
             while (currentDevices.some(d => d.id === newId)) {
                 newId = (formData.serial || 'no_serial') + '_' + Date.now() + '_' + Math.random().toString(16).slice(2, 8);
             }
             deviceToSave.id = newId;
         }
+        // Добавляем рассчитанную дату следующей поверки (если она есть)
+        // В IndexedDB лучше хранить строку YYYY-MM-DD или null
+        deviceToSave.nextCheckDate = nextCheckDateString;
 
         await saveDevice(deviceToSave); // Зберігаємо в IndexedDB
 
@@ -51,14 +59,15 @@ async function handleSaveDevice(formData, id) {
         if (isEditing) {
             const index = currentDevices.findIndex(d => d.id === id);
             if (index !== -1) {
-                currentDevices[index] = deviceToSave;
+                currentDevices[index] = deviceToSave; // Обновляем объект в массиве
                 console.log("Device updated in currentDevices array.");
             } else {
                  console.warn(`Device with ID ${id} was saved to DB, but not found in currentDevices array for update.`);
-                 // Можливо, варто перезавантажити дані з БД тут, але поки що оновимо UI
+                 // Можно перезагрузить данные из БД для консистентности
+                 // currentDevices = await getAllDevices();
             }
         } else {
-            currentDevices.push(deviceToSave);
+            currentDevices.push(deviceToSave); // Добавляем новый объект в массив
             console.log("New device added to currentDevices array.");
         }
 
@@ -100,63 +109,59 @@ async function handleDeleteDevice(id) {
 async function importFromCSV() {
     console.log("Attempting to import data from CSV...");
     try {
+        // Убедитесь, что путь к файлу CSV правильный относительно корня сайта
         const response = await fetch('Прилади - Аркуш1.csv');
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(`HTTP error! status: ${response.status}, failed to fetch CSV.`);
         }
         const csvText = await response.text();
         const lines = csvText.split(/\r?\n/); // Розділення на рядки (враховуючи \r)
 
-        const devicesToSave = [];
+        const devicesToImport = [];
         // Починаємо з 3-го рядка (індекс 2), пропускаючи порожній рядок і заголовки
         for (let i = 2; i < lines.length; i++) {
             const line = lines[i].trim();
             if (!line) continue; // Пропускаємо порожні рядки
 
-            // Розділяємо рядок по комірках. Увага: цей метод не обробляє коми всередині лапок.
-            // Якщо у вас є коми в назвах, потрібен складніший парсер.
+            // Простой парсер CSV, может не работать с запятыми внутри кавычек
             const columns = line.split(',');
 
-            // Перевіряємо, чи є достатньо колонок (припускаємо 9 колонок, як у файлі)
+            // Проверяем, есть ли достаточно колонок
             if (columns.length < 9) {
                  console.warn(`Skipping line ${i + 1}: not enough columns (${columns.length})`, line);
                  continue;
             }
 
-            // Витягуємо дані з потрібних колонок (індекси з 0)
+            // Извлекаем данные
             const rm = columns[1].trim();
             const name = columns[2].trim();
             const type = columns[3].trim();
             const serial = columns[4].trim();
             const lastCheckDateStr = columns[5].trim();
-            // const nextCheckDateStr = columns[6].trim(); // Не використовуємо
             const mpiStr = columns[7].trim();
             const location = columns[8].trim();
 
-            // --- Базова валідація та перетворення ---
+            // --- Базовая валидация и преобразование ---
             if (!rm || !name || !type || !serial) {
                  console.warn(`Skipping line ${i + 1}: Missing required fields (RM, Name, Type, Serial)`, line);
                  continue;
             }
 
             let lastCheckDate = null;
-            // Спроба перетворити дату з ДД.ММ.ГГГГ в ГГГГ-ММ-ДД
+            // Преобразование даты из ДД.ММ.ГГГГ в ГГГГ-ММ-ДД
             const dateMatch = lastCheckDateStr.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
             if (dateMatch) {
                 lastCheckDate = `${dateMatch[3]}-${dateMatch[2]}-${dateMatch[1]}`;
-            } else {
-                 console.warn(`Skipping line ${i + 1}: Invalid last check date format (${lastCheckDateStr})`, line);
-                // Можна залишити null або пропустити рядок зовсім
-                 lastCheckDate = null; // залишаємо null, якщо формат неправильний
+            } else if (lastCheckDateStr) { // Логируем только если дата не пустая, но формат неверный
+                 console.warn(`Line ${i + 1}: Invalid last check date format (${lastCheckDateStr}), setting to null.`, line);
             }
 
             const mpi = parseInt(mpiStr) || null;
-            if (mpi === null) {
-                 console.warn(`Skipping line ${i + 1}: Invalid MPI value (${mpiStr})`, line);
-                 //continue; // Якщо MPI обов'язковий, розкоментуйте
+            if (mpi === null && mpiStr) { // Логируем только если MPI не пустое, но не число
+                 console.warn(`Line ${i + 1}: Invalid MPI value (${mpiStr}), setting to null.`, line);
             }
 
-            // Створюємо об'єкт приладу БЕЗ ID
+            // Создаем объект прибора БЕЗ ID и nextCheckDate (они будут добавлены позже)
             const deviceData = {
                 rm: rm,
                 name: name,
@@ -164,44 +169,41 @@ async function importFromCSV() {
                 serial: serial,
                 lastCheckDate: lastCheckDate,
                 mpi: mpi,
-                location: location || null, // Якщо розташування порожнє, ставимо null
-                povirkyLocation: null, // Цієї колонки немає в CSV, ініціалізуємо як null
-                notes: null, // Цієї колонки немає в CSV
-                // ID буде згенеровано в handleSaveDevice/saveDevice
+                location: location || null,
+                povirkyLocation: null, // Инициализируем как null
+                notes: null, // Инициализируем как null
             };
 
-            devicesToSave.push(deviceData);
+            devicesToImport.push(deviceData);
         }
 
-        console.log(`Parsed ${devicesToSave.length} devices from CSV.`);
+        console.log(`Parsed ${devicesToImport.length} devices from CSV.`);
 
-        if (devicesToSave.length > 0) {
+        if (devicesToImport.length > 0) {
             console.log("Saving imported devices to IndexedDB...");
-            // Використовуємо Promise.all для паралельного збереження, але обережно з великою кількістю
-            // Можливо, краще зберігати послідовно або пакетами для дуже великих файлів
-
-            // Потрібно генерувати ID тут або передавати дані в handleSaveDevice,
-            // який сам згенерує ID, якщо він відсутній.
-            // Викличемо handleSaveDevice для кожного, щоб використати існуючу логіку генерації ID.
-            const savePromises = devicesToSave.map(deviceData => handleSaveDevice(deviceData, null));
+            // Используем Promise.all для параллельного сохранения
+            // handleSaveDevice сам сгенерирует ID и рассчитает nextCheckDate
+            const savePromises = devicesToImport.map(deviceData => handleSaveDevice(deviceData, null)); // Передаем null как ID для создания
 
             await Promise.all(savePromises);
             console.log("Finished saving imported devices.");
-            return true; // Сигналізуємо, що імпорт відбувся
+            return true; // Сигнализируем, что импорт произошел
+        } else {
+             console.log("No valid devices found in CSV to import.");
         }
 
     } catch (error) {
         console.error("Error importing data from CSV:", error);
         alert("Помилка імпорту даних з CSV. Дивіться консоль.");
     }
-    return false; // Імпорт не відбувся або була помилка
+    return false; // Импорт не состоялся или была ошибка
 }
 
 // --- Обробники подій ---
 
 // Обробник кліку на кнопку "Додати"
 addDeviceBtn.addEventListener('click', () => {
-    openModal(null); // Відкриваємо модалку для додавання
+    openModal(null); // Відкриваємо модалку для додавання (null означает новый прибор)
 });
 
 // Обробник фільтрації РМ
@@ -210,56 +212,59 @@ rmFilterContainer.addEventListener('click', (event) => {
         const selectedRM = event.target.dataset.rm;
         if (selectedRM !== currentRMFilter) {
             currentRMFilter = selectedRM;
+            // Обновляем активную кнопку
             rmFilterContainer.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.rm === currentRMFilter);
             });
-            renderDeviceList(currentDevices, currentRMFilter); // Перемальовуємо список
+            renderDeviceList(currentDevices, currentRMFilter); // Перерисовываем список с новым фильтром
         }
     }
 });
 
 // --- Початкове Завантаження ---
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log("DOM завантажено. Ініціалізація IndexedDB...");
+    console.log("DOM fully loaded and parsed. Initializing application...");
     try {
         await initDB();
-        console.log("IndexedDB ініціалізовано. Завантаження даних...");
+        console.log("IndexedDB initialized. Loading initial data...");
         let initialDevices = await getAllDevices();
-        console.log(`Завантажено ${initialDevices.length} приладів з IndexedDB.`);
+        console.log(`Loaded ${initialDevices.length} devices from IndexedDB.`);
 
-        // Перевіряємо, чи база даних порожня
+        // Проверяем, пуста ли база данных и есть ли CSV файл для импорта
         if (initialDevices.length === 0) {
-            console.log("База даних порожня. Спроба імпорту з CSV...");
+            console.log("Database is empty. Attempting initial import from CSV...");
             const imported = await importFromCSV();
             if (imported) {
-                // Якщо імпорт пройшов успішно, перезавантажуємо дані з БД
+                // Если импорт прошел успешно, перезагружаем данные из БД
                 initialDevices = await getAllDevices();
-                console.log(`Перезавантажено ${initialDevices.length} приладів після імпорту.`);
+                console.log(`Reloaded ${initialDevices.length} devices after import.`);
+            } else {
+                 console.log("CSV import failed or CSV was empty/invalid. Starting with an empty list.");
             }
         }
 
-        // Оновлюємо глобальну змінну
+        // Обновляем глобальную переменную
         currentDevices = initialDevices;
 
-        // Ініціалізуємо обробники UI, передаючи НАШІ функції як колбеки
+        // Инициализируем обработчики UI, передавая НАШИ функции сохранения и удаления
         initUIHandlers(handleSaveDevice, handleDeleteDevice);
 
-        // Ініціалізуємо та показуємо сповіщення
+        // Инициализируем и показываем уведомления (если есть)
         initNotifications(currentDevices);
 
-        // Перший рендеринг UI
+        // Первый рендеринг UI
         updateUI();
 
-        console.log("Application initialized."); // Змінено повідомлення
+        console.log("Application initialization complete.");
 
     } catch (error) {
-        console.error("Помилка ініціалізації програми:", error);
-        // Можна показати повідомлення користувачу про помилку завантаження
+        console.error("Critical error during application initialization:", error);
+        // Показываем сообщение об ошибке пользователю
         const listContainer = document.getElementById('device-list');
         if (listContainer) {
-            listContainer.innerHTML = '<p class="error-message">Не вдалося завантажити дані. Перевірте консоль для деталей.</p>';
+            listContainer.innerHTML = '<p class="error-message">Не вдалося завантажити дані програми. Будь ласка, спробуйте оновити сторінку або перевірте консоль розробника.</p>';
         }
-        // Прибираємо плейсхолдер завантаження, якщо він є
+         // Убираем плейсхолдер загрузки, если он есть
         const loadingPlaceholder = document.querySelector('.loading-placeholder');
         loadingPlaceholder?.remove();
     }
