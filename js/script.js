@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         currentDevices = await getAllDevices(); // Потім завантажуємо дані
         console.log(`Завантажено ${currentDevices.length} приладів з IndexedDB.`);
 
-        // Ініціалізуємо обробники UI, передаючи асинхронні функції
+        // Ініціалізуємо обробники UI, передаючи НАШІ функції як колбеки
         initUIHandlers(handleSaveDevice, handleDeleteDevice);
 
         // Ініціалізуємо та показуємо сповіщення
