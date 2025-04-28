@@ -257,7 +257,7 @@ body {
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     position: relative;
-    overflow: hidden; /* Важно для предотвращения вылезания контента */
+    overflow: hidden;
 }
 .device-card:hover { transform: translateY(-4px); box-shadow: 0 6px 12px var(--shadow-color-medium); }
 
@@ -277,28 +277,27 @@ body {
     font-weight: 600;
 }
 .card-details p {
-    margin: 1px 0;
-    font-size: 0.85em;
+    /* --- ИЗМЕНЕНО: Убираем margin и уменьшаем line-height и font-size --- */
+    margin: 0; /* Убираем вертикальные отступы */
+    font-size: 0.8em; /* Уменьшаем шрифт */
     color: #495057;
     display: flex;
-    /* --- ИЗМЕНЕНО: Добавим flex-wrap для переноса на мобильных --- */
     flex-wrap: wrap;
     align-items: baseline;
-    word-break: break-word; /* Разрешаем перенос длинных слов */
-    line-height: 1.4;
+    word-break: break-word;
+    line-height: 1.3; /* Уменьшаем межстрочный интервал */
+    /* --- ДОБАВЛЕНО: Небольшой отступ снизу для разделения строк --- */
+    padding-bottom: 2px;
 }
 .card-details strong {
     color: var(--text-color);
     font-weight: 500;
     margin-right: 6px;
-    flex-shrink: 0; /* Не сжимаем метку */
-    /* --- ИЗМЕНЕНО: Убираем фиксированную ширину --- */
-    /* width: 100px; */
+    flex-shrink: 0;
 }
 .card-details span {
-    flex-grow: 1; /* Занимает оставшееся место */
-    /* --- ИЗМЕНЕНО: Добавим min-width, чтобы избежать слишком узкого значения --- */
-    min-width: 50%; /* Можно подбирать значение */
+    flex-grow: 1;
+    min-width: 50%;
 }
 .notes-text { font-style: italic; color: var(--text-secondary-color); }
 
@@ -308,9 +307,10 @@ body {
     padding-top: 8px;
 }
 .card-notes p {
-    margin: 1px 0;
-    font-size: 0.85em;
-    line-height: 1.4;
+    margin: 0; /* Убираем margin */
+    font-size: 0.8em; /* Уменьшаем шрифт */
+    line-height: 1.3; /* Уменьшаем межстрочный интервал */
+    padding-bottom: 2px;
 }
 
 /* Шкала повірки */
@@ -428,7 +428,8 @@ button, input, select, textarea {
     .device-list-container { grid-template-columns: repeat(3, 1fr); gap: 20px;}
     .app-header h1 { font-size: 1.5em; }
     .device-card { padding: 20px; }
-    .card-details p { font-size: 0.9em; flex-wrap: nowrap; /* Возвращаем без переноса на больших экранах */ }
-    .card-details span { min-width: 0; /* Убираем min-width на больших экранах */ }
-    /* .card-details strong { width: 110px; } */ /* Оставим без фиксированной ширины */
+    /* --- ИЗМЕНЕНО: Возвращаем размер шрифта, но оставляем line-height и margin --- */
+    .card-details p { font-size: 0.9em; flex-wrap: nowrap; line-height: 1.3; margin: 0; padding-bottom: 2px; }
+    .card-notes p { font-size: 0.9em; line-height: 1.3; margin: 0; padding-bottom: 2px; }
+    .card-details span { min-width: 0; }
 }
