@@ -277,26 +277,26 @@ body {
     font-weight: 600;
 }
 .card-details p {
-    /* --- ИЗМЕНЕНО: Еще уменьшаем шрифт и line-height, убираем padding-bottom --- */
+    /* --- ИЗМЕНЕНО: Уменьшаем line-height до 1.2 --- */
     margin: 0;
-    font-size: 0.75em; /* Еще меньше шрифт */
+    font-size: 0.75em;
     color: #495057;
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
     word-break: break-word;
-    line-height: 1.25; /* Еще меньше межстрочный интервал */
-    padding-bottom: 0; /* Убираем нижний паддинг */
+    line-height: 1.2; /* Еще меньше */
+    padding-bottom: 0;
 }
 .card-details strong {
     color: var(--text-color);
     font-weight: 500;
-    margin-right: 4px; /* Немного уменьшим отступ справа */
+    margin-right: 4px;
     flex-shrink: 0;
 }
 .card-details span {
     flex-grow: 1;
-    min-width: 50%;
+    min-width: 50%; /* Оставляем для предотвращения слишком узких значений */
 }
 .notes-text { font-style: italic; color: var(--text-secondary-color); }
 
@@ -306,10 +306,10 @@ body {
     padding-top: 8px;
 }
 .card-notes p {
-    /* --- ИЗМЕНЕНО: Применяем те же стили, что и для .card-details p --- */
+    /* --- ИЗМЕНЕНО: Применяем line-height 1.2 --- */
     margin: 0;
     font-size: 0.75em;
-    line-height: 1.25;
+    line-height: 1.2; /* Еще меньше */
     padding-bottom: 0;
 }
 
@@ -428,8 +428,9 @@ button, input, select, textarea {
     .device-list-container { grid-template-columns: repeat(3, 1fr); gap: 20px;}
     .app-header h1 { font-size: 1.5em; }
     .device-card { padding: 20px; }
-    /* --- ИЗМЕНЕНО: Возвращаем размер шрифта 0.9em, но оставляем line-height и margin 0 --- */
-    .card-details p { font-size: 0.9em; flex-wrap: nowrap; line-height: 1.25; margin: 0; padding-bottom: 0; }
-    .card-notes p { font-size: 0.9em; line-height: 1.25; margin: 0; padding-bottom: 0; }
+    /* --- ИЗМЕНЕНО: Возвращаем размер шрифта 0.9em, но оставляем line-height 1.2 --- */
+    .card-details p { font-size: 0.9em; flex-wrap: nowrap; line-height: 1.2; margin: 0; padding-bottom: 0; }
+    .card-notes p { font-size: 0.9em; line-height: 1.2; margin: 0; padding-bottom: 0; }
     .card-details span { min-width: 0; }
 }
+
