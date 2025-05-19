@@ -74,7 +74,7 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useCallback, useMemo } = React;
+        const { useState, useEffect, useCallback, useMemo, useRef } = React; // Added useRef
 
         // --- Database Utilities (db.js) ---
         const DB_NAME = 'priboriReactDB';
@@ -127,7 +127,7 @@
                 }
                 const transaction = db.transaction(STORE_NAME, 'readwrite');
                 const store = transaction.objectStore(STORE_NAME);
-                const request = store.put(device);
+                const request = store.put(device); // put will add or update
                 request.onerror = (event) => reject(`Error saving device: ${event.target.error}`);
                 request.onsuccess = () => resolve();
             });
@@ -144,6 +144,19 @@
                 request.onsuccess = () => resolve();
             });
         }
+        
+        // New DB utility to clear all devices
+        async function clearAllDevicesDB() {
+            const db = await initDB();
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(STORE_NAME, 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.clear();
+                request.onerror = (event) => reject(`Error clearing store: ${event.target.error}`);
+                request.onsuccess = () => resolve();
+            });
+        }
+
 
         // --- Calculation Utilities (calculations.js) ---
         function formatDate(dateString) {
@@ -283,11 +296,11 @@
         }
 
         // FilterControls Component
-        function FilterControls({ currentRM, onRMChange, onAddDevice }) {
+        function FilterControls({ currentRM, onRMChange, onAddDevice, onExport, onImportTrigger }) { // Added onExport, onImportTrigger
             const rms = ["all", "111", "112"];
             return (
                 <div className="my-4 flex flex-wrap gap-4 items-center justify-between">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap"> {/* Added flex-wrap for smaller screens */}
                         <span className="text-sm font-medium text-gray-600">РМ:</span>
                         <div className="inline-flex rounded-md shadow-sm bg-gray-200">
                             {rms.map(rm => (
@@ -302,15 +315,29 @@
                             ))}
                         </div>
                     </div>
-                    <button
-                        onClick={onAddDevice}
-                        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md shadow-md hover:shadow-lg transition-all duration-150 ease-in-out flex items-center gap-2 text-sm"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-plus-lg" viewBox="0 0 16 16">
-                            <path fillRule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
-                        </svg>
-                        Додати
-                    </button>
+                    <div className="flex gap-2 flex-wrap"> {/* Container for action buttons */}
+                        <button
+                            onClick={onExport}
+                            className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-3 rounded-md shadow-md hover:shadow-lg transition-all duration-150 ease-in-out flex items-center gap-2 text-sm"
+                        >
+                           <i className="fas fa-file-export"></i> Экспорт JSON
+                        </button>
+                        <button
+                            onClick={onImportTrigger}
+                            className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-3 rounded-md shadow-md hover:shadow-lg transition-all duration-150 ease-in-out flex items-center gap-2 text-sm"
+                        >
+                           <i className="fas fa-file-import"></i> Импорт JSON
+                        </button>
+                        <button
+                            onClick={onAddDevice}
+                            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md shadow-md hover:shadow-lg transition-all duration-150 ease-in-out flex items-center gap-2 text-sm"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-plus-lg" viewBox="0 0 16 16">
+                                <path fillRule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
+                            </svg>
+                            Додати
+                        </button>
+                    </div>
                 </div>
             );
         }
@@ -318,7 +345,6 @@
         // ImageZoomModal Component
         function ImageZoomModal({ imageUrl, onClose }) {
             if (!imageUrl) return null;
-
             return (
                 <div 
                     className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-[1050] modal-animation" 
@@ -347,10 +373,8 @@
         function DeviceCard({ device, onEdit, onImageClick }) {
             const nextCheckStatus = getNextCheckDateStatus(calculateNextCheckDate(device.lastCheckDate, device.mpi));
             const timeline = getTimelineData(device.lastCheckDate, calculateNextCheckDate(device.lastCheckDate, device.mpi), device.mpi);
-            
             const imageFileName = device.type ? `${device.type.replace(/[\/\s\\?%*:|"<>]/g, '_')}.png` : null;
             const imageUrl = imageFileName ? `img/${imageFileName}` : null;
-
             const [imageError, setImageError] = useState(false);
 
             useEffect(() => {
@@ -409,7 +433,6 @@
                             )}
                         </div>
                     </div>
-
                     <div className="mt-3">
                         {(timeline.percent > 0 || timeline.timelineClassName === 'timeline-expired') && (
                             <div className="mb-2" title={`Пройшло приблизно ${timeline.percent}% інтервалу повірки`}>
@@ -417,8 +440,7 @@
                                     <div
                                         className={`h-2.5 rounded-full ${timeline.timelineClassName} transition-all duration-500 ease-out flex items-center justify-center`}
                                         style={{ width: `${timeline.percent}%` }}
-                                    >
-                                    </div>
+                                    ></div>
                                 </div>
                             </div>
                         )}
@@ -455,12 +477,9 @@
             if (!isLoading && devices.length === 0) { 
                  return <div className="text-center py-10 text-gray-500 bg-white rounded-lg shadow p-6">Список приладів порожній.</div>;
             }
-            if (filteredDevices.length === 0 && currentRMFilter !== 'all') { // This check should come after loading/empty checks
+            if (filteredDevices.length === 0 && currentRMFilter !== 'all') {
                  return <div className="text-center py-10 text-gray-500 bg-white rounded-lg shadow p-6">Немає приладів для РМ "{currentRMFilter}".</div>;
             }
-            // If filteredDevices is empty, but devices.length > 0 and currentRMFilter === 'all', it means there are no devices at all.
-            // This case is covered by the second condition.
-
             return (
                 <>
                     <div className="text-sm text-gray-600 text-right mb-2">
@@ -481,7 +500,6 @@
                 id: '', rm: '', name: '', type: '', serial: '',
                 lastCheckDate: '', mpi: '', location: '', povirkyLocation: '', notes: ''
             });
-
             useEffect(() => {
                 if (device) {
                     setFormData({ ...device, mpi: device.mpi || '', lastCheckDate: device.lastCheckDate || '' });
@@ -492,12 +510,10 @@
                     });
                 }
             }, [device]);
-
             const handleChange = (e) => {
                 const { name, value } = e.target;
                 setFormData(prev => ({ ...prev, [name]: value }));
             };
-
             const handleSubmit = (e) => {
                 e.preventDefault();
                 const deviceToSave = {
@@ -511,16 +527,13 @@
                 }
                 onSave(deviceToSave);
             };
-
             const handleDelete = () => {
                 if (device && device.id && window.confirm(`Ви впевнені, що хочете видалити "${device.name || 'цей прилад'}"?`)) {
                     onDelete(device.id);
                 }
             };
-            
             const inputClass = "mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm";
             const labelClass = "block text-sm font-medium text-gray-700";
-
             return (
                 <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center p-4 z-[1000] modal-animation" onClick={onClose}>
                     <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto modal-content-scrollable" onClick={e => e.stopPropagation()}>
@@ -600,7 +613,6 @@
             const textColor = isWarning ? 'text-amber-700' : 'text-red-700';
             const buttonHoverBg = isWarning ? 'hover:bg-amber-100' : 'hover:bg-red-100';
             const buttonFocusRing = isWarning ? 'focus:ring-amber-600 focus:ring-offset-amber-50' : 'focus:ring-red-600 focus:ring-offset-red-50';
-
             return (
                  <div className={`flex items-start p-3 mb-3 rounded-md shadow-lg border-l-4 ${bgColor} ${isVisible ? 'notification-slide-in' : 'notification-slide-out'}`}>
                     <div className="flex-shrink-0 pt-0.5">
@@ -671,7 +683,6 @@
                     });
                 setNotifications(activeNotifications);
             }, [devices]);
-
             const handleCloseNotification = (id) => {
                 setNotifications(prev => prev.filter(n => n.id !== id));
             };
@@ -693,6 +704,7 @@
             const [isModalOpen, setIsModalOpen] = useState(false);
             const [isLoading, setIsLoading] = useState(true);
             const [zoomedImageUrl, setZoomedImageUrl] = useState(null);
+            const fileInputRef = useRef(null); // Ref for file input
 
             const loadDevices = useCallback(async () => {
                 setIsLoading(true);
@@ -810,10 +822,85 @@
             const handleImageZoom = (imageUrl) => {
                 setZoomedImageUrl(imageUrl);
             };
-
             const handleCloseImageZoom = () => {
                 setZoomedImageUrl(null);
             };
+
+            // Export Data Function
+            const handleExportData = async () => {
+                try {
+                    const allDevices = await getAllDevicesDB();
+                    if (allDevices.length === 0) {
+                        alert("Немає даних для експорту.");
+                        return;
+                    }
+                    const jsonData = JSON.stringify(allDevices, null, 2); // Pretty print JSON
+                    const blob = new Blob([jsonData], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'devices_data.json';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    alert("Дані успішно експортовано!");
+                } catch (error) {
+                    console.error("Error exporting data:", error);
+                    alert("Помилка експорту даних.");
+                }
+            };
+
+            // Import Data Function
+            const handleImportData = async (event) => {
+                const file = event.target.files[0];
+                if (!file) {
+                    return;
+                }
+                if (!window.confirm("УВАГА! Імпорт замінить усі поточні дані. Ви впевнені, що хочете продовжити?")) {
+                    if(fileInputRef.current) fileInputRef.current.value = ""; // Reset file input
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const importedDevices = JSON.parse(e.target.result);
+                        if (!Array.isArray(importedDevices)) {
+                            throw new Error("Формат файлу невірний. Очікується масив приладів.");
+                        }
+                        
+                        // Validate basic structure of imported devices (optional but recommended)
+                        for(const device of importedDevices){
+                            if(typeof device.id === 'undefined' || !device.name || !device.type || !device.serial){
+                                throw new Error(`Невірний формат об'єкта приладу в файлі: ${JSON.stringify(device)}`);
+                            }
+                            // Ensure nextCheckDate is recalculated or validated if present
+                            device.nextCheckDate = calculateNextCheckDate(device.lastCheckDate, device.mpi);
+                        }
+
+                        await clearAllDevicesDB(); // Clear existing data
+                        for (const device of importedDevices) {
+                            await saveDeviceDB(device); // Save imported devices
+                        }
+                        await loadDevices(); // Reload and update UI
+                        alert(`Дані успішно імпортовано. Завантажено ${importedDevices.length} прилад(ів).`);
+                    } catch (error) {
+                        console.error("Error importing data:", error);
+                        alert(`Помилка імпорту даних: ${error.message}`);
+                    } finally {
+                         if(fileInputRef.current) fileInputRef.current.value = ""; // Reset file input
+                    }
+                };
+                reader.readAsText(file);
+            };
+            
+            const triggerImportFileSelect = () => {
+                if (fileInputRef.current) {
+                    fileInputRef.current.click();
+                }
+            };
+
 
             return (
                 <div className="min-h-screen bg-gray-100">
@@ -823,6 +910,15 @@
                             currentRM={currentRMFilter}
                             onRMChange={handleRMFILTERChange}
                             onAddDevice={handleAddDevice}
+                            onExport={handleExportData}
+                            onImportTrigger={triggerImportFileSelect}
+                        />
+                        <input 
+                            type="file" 
+                            accept=".json" 
+                            ref={fileInputRef} 
+                            onChange={handleImportData} 
+                            className="hidden" 
                         />
                         <NotificationsArea devices={devices} />
                         <DeviceList
