@@ -17,8 +17,8 @@
     <style>
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f0f4f8; /* Светло-серый фон */
-            color: #1c3144; /* Темно-синий текст */
+            background-color: #f0f4f8; 
+            color: #1c3144; 
         }
         .modal-content-scrollable::-webkit-scrollbar {
             width: 8px;
@@ -322,11 +322,11 @@
             return (
                 <div 
                     className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-[1050] modal-animation" 
-                    onClick={onClose} // Закрытие по клику на фон
+                    onClick={onClose}
                 >
                     <div 
                         className="bg-white p-2 rounded-lg shadow-2xl relative image-zoom-modal-content" 
-                        onClick={e => e.stopPropagation()} // Предотвращаем закрытие при клике на само изображение
+                        onClick={e => e.stopPropagation()}
                     >
                         <img src={imageUrl} alt="Збільшене зображення приладу" className="max-w-full max-h-full object-contain rounded" />
                         <button 
@@ -343,9 +343,8 @@
             );
         }
 
-
         // DeviceCard Component
-        function DeviceCard({ device, onEdit, onImageClick }) { // Added onImageClick
+        function DeviceCard({ device, onEdit, onImageClick }) {
             const nextCheckStatus = getNextCheckDateStatus(calculateNextCheckDate(device.lastCheckDate, device.mpi));
             const timeline = getTimelineData(device.lastCheckDate, calculateNextCheckDate(device.lastCheckDate, device.mpi), device.mpi);
             
@@ -359,7 +358,7 @@
             }, [device.type]);
 
             const handleImageClick = (e) => {
-                e.stopPropagation(); // Prevent card click (onEdit) when image is clicked
+                e.stopPropagation();
                 if (imageUrl && !imageError) {
                     onImageClick(imageUrl);
                 }
@@ -367,7 +366,7 @@
 
             return (
                 <div
-                    onClick={() => onEdit(device)} // Edit is triggered by card click
+                    onClick={() => onEdit(device)}
                     className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-200 p-4 cursor-pointer border border-gray-200 flex flex-col justify-between"
                 >
                     <div className="flex-grow">
@@ -380,19 +379,19 @@
                                     <p><strong>РМ:</strong> {device.rm || '-'}</p>
                                     <p><strong>Розташування:</strong> {device.location || '-'}</p>
                                     <p><strong>Місце повірки:</strong> {device.povirkyLocation || '-'}</p>
-                                    <p><strong>Остання повірка:</strong> {formatDate(device.lastCheckDate)}</p> {/* UPDATED TEXT */}
+                                    <p><strong>Остання повірка:</strong> {formatDate(device.lastCheckDate)}</p>
                                     <p><strong>МПІ:</strong> {device.mpi ? `${device.mpi} р.` : '-'}</p>
-                                    <p className="flex items-center"><strong>Наступна повірка:</strong> {/* UPDATED TEXT */}
+                                    <p className="flex items-center"><strong>Наступна повірка:</strong>
                                         <span className={`ml-1 px-1.5 py-0.5 rounded-sm text-xs font-medium ${nextCheckStatus.className}`}>
                                             {nextCheckStatus.text}
                                         </span>
                                     </p>
                                 </div>
                             </div>
-                            {imageUrl && ( // Render container for image or fallback
+                            {imageUrl && (
                                 <div 
                                     className="w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 ml-2 cursor-pointer"
-                                    onClick={handleImageClick} // Click handler for image zoom
+                                    onClick={handleImageClick}
                                 >
                                     {!imageError ? (
                                         <img 
@@ -430,7 +429,7 @@
         }
 
         // DeviceList Component
-        function DeviceList({ devices, onEdit, currentRMFilter, onImageClick }) { // Added onImageClick
+        function DeviceList({ devices, onEdit, currentRMFilter, onImageClick, isLoading }) {
              const filteredDevices = useMemo(() => {
                 const filtered = currentRMFilter === 'all'
                     ? [...devices]
@@ -450,15 +449,17 @@
                 });
             }, [devices, currentRMFilter]);
 
-            if (devices.length === 0 && isLoading) { // Show loading only if devices are empty AND loading
+            if (isLoading && devices.length === 0) { 
                 return <div className="text-center py-10 text-gray-500 bg-white rounded-lg shadow p-6">Завантаження приладів...</div>;
             }
-            if (devices.length === 0 && !isLoading) { // Show empty list if not loading
+            if (!isLoading && devices.length === 0) { 
                  return <div className="text-center py-10 text-gray-500 bg-white rounded-lg shadow p-6">Список приладів порожній.</div>;
             }
-            if (filteredDevices.length === 0 && currentRMFilter !== 'all') {
+            if (filteredDevices.length === 0 && currentRMFilter !== 'all') { // This check should come after loading/empty checks
                  return <div className="text-center py-10 text-gray-500 bg-white rounded-lg shadow p-6">Немає приладів для РМ "{currentRMFilter}".</div>;
             }
+            // If filteredDevices is empty, but devices.length > 0 and currentRMFilter === 'all', it means there are no devices at all.
+            // This case is covered by the second condition.
 
             return (
                 <>
@@ -474,7 +475,7 @@
             );
         }
 
-        // DeviceModal Component (no changes needed for these requests)
+        // DeviceModal Component
         function DeviceModal({ device, onClose, onSave, onDelete }) {
             const [formData, setFormData] = useState({
                 id: '', rm: '', name: '', type: '', serial: '',
@@ -584,7 +585,7 @@
             );
         }
         
-        // NotificationItem Component (no changes needed for these requests)
+        // NotificationItem Component
         function NotificationItem({ notification, onClose }) {
             const [isVisible, setIsVisible] = useState(true);
             const handleClose = () => {
@@ -630,7 +631,7 @@
             );
         }
 
-        // NotificationsArea Component (no changes needed for these requests)
+        // NotificationsArea Component
         function NotificationsArea({ devices }) {
             const [notifications, setNotifications] = useState([]);
             useEffect(() => {
@@ -691,7 +692,7 @@
             const [editingDevice, setEditingDevice] = useState(null);
             const [isModalOpen, setIsModalOpen] = useState(false);
             const [isLoading, setIsLoading] = useState(true);
-            const [zoomedImageUrl, setZoomedImageUrl] = useState(null); // State for image zoom
+            const [zoomedImageUrl, setZoomedImageUrl] = useState(null);
 
             const loadDevices = useCallback(async () => {
                 setIsLoading(true);
@@ -790,7 +791,6 @@
                 }).length;
             }, [devices]);
 
-            // Badging API Effect
             useEffect(() => {
                 if ('setAppBadge' in navigator) {
                     if (overdueCount > 0) {
@@ -829,8 +829,8 @@
                             devices={devices}
                             onEdit={handleEditDevice}
                             currentRMFilter={currentRMFilter}
-                            onImageClick={handleImageZoom} // Pass handler to DeviceList
-                            isLoading={isLoading} // Pass loading state
+                            onImageClick={handleImageZoom}
+                            isLoading={isLoading} 
                         />
                     </main>
                     {isModalOpen && (
@@ -841,7 +841,7 @@
                             onDelete={handleDeleteDevice}
                         />
                     )}
-                    {zoomedImageUrl && ( // Render ImageZoomModal
+                    {zoomedImageUrl && (
                         <ImageZoomModal 
                             imageUrl={zoomedImageUrl} 
                             onClose={handleCloseImageZoom} 
