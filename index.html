@@ -298,9 +298,9 @@
         function FilterControls({ currentRM, onRMChange, onAddDevice, onExport, onImportTrigger, searchTerm, onSearchChange }) {
             const rms = ["all", "111", "112"];
             return (
-                <div className="my-4 flex flex-col sm:flex-row gap-4 items-center justify-between">
-                    {/* Left side: RM Filter and Search */}
-                    <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+                <div className="my-4 flex flex-col lg:flex-row gap-4 items-center justify-between">
+                    {/* Left side: RM Filter and Search - now always in a row */}
+                    <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
                         <div className="flex items-center gap-2">
                             <span className="text-sm font-medium text-gray-600">РМ:</span>
                             <div className="inline-flex rounded-md shadow-sm bg-gray-200">
@@ -316,7 +316,7 @@
                                 ))}
                             </div>
                         </div>
-                        <div className="relative flex-grow w-full sm:w-auto sm:ml-4">
+                        <div className="relative flex-grow w-full sm:w-auto"> {/* Removed sm:ml-4 to allow flex-grow */}
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <i className="fas fa-search text-gray-400"></i>
                             </div>
@@ -329,8 +329,8 @@
                             />
                         </div>
                     </div>
-                    {/* Right side: Action Buttons */}
-                    <div className="flex gap-2 flex-wrap justify-center sm:justify-end mt-4 sm:mt-0">
+                    {/* Right side: Action Buttons - now always in a row */}
+                    <div className="flex items-center gap-2 flex-wrap justify-center lg:justify-end mt-4 lg:mt-0">
                         <button
                             onClick={onExport}
                             className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-3 rounded-md shadow-md hover:shadow-lg transition-all duration-150 ease-in-out flex items-center gap-2 text-sm"
@@ -388,17 +388,17 @@
         function DeviceCard({ device, onEdit, onImageClick }) {
             const nextCheckStatus = getNextCheckDateStatus(calculateNextCheckDate(device.lastCheckDate, device.mpi));
             const timeline = getTimelineData(device.lastCheckDate, calculateNextCheckDate(device.lastCheckDate, device.mpi), device.mpi);
-            // UPDATED: Added hyphen to the regex for replacement
-            const imageFileName = device.type ? `${device.type.replace(/[\/\s\\?%*:|"<> -]/g, '_')}.png` : null;
+            // CORRECTED Regex: Only replace specified special characters, keep hyphens.
+            const imageFileName = device.type ? `${device.type.replace(/[\/\s\\?%*:|"<>]/g, '_')}.png` : null;
             const imageUrl = imageFileName ? `img/${imageFileName}` : null;
             
-            // console.log(`Device Type: ${device.type}, Attempting to load image: ${imageUrl}`);
+            // console.log(`Device Type: ${device.type}, Attempting to load image: ${imageUrl}`); // Keep for debugging if needed
 
             const [imageError, setImageError] = useState(false);
 
             useEffect(() => {
                 setImageError(false);
-            }, [device.type]);
+            }, [device.type]); // Reset error when device.type changes
 
             const handleImageClick = (e) => {
                 e.stopPropagation();
@@ -473,20 +473,13 @@
         }
 
         // DeviceList Component
-        function DeviceList({ devices, onEdit, onImageClick, isLoading }) { // Renamed filteredAndSortedDevices to devices
-             // Filtering and sorting logic is now in App component, 
-             // this component just receives the final list to render.
-
+        function DeviceList({ devices, onEdit, onImageClick, isLoading }) {
             if (isLoading && devices.length === 0) { 
                 return <div className="text-center py-10 text-gray-500 bg-white rounded-lg shadow p-6">Завантаження приладів...</div>;
             }
             if (!isLoading && devices.length === 0) { 
                  return <div className="text-center py-10 text-gray-500 bg-white rounded-lg shadow p-6">Список приладів порожній або не знайдено за фільтрами.</div>;
             }
-            // This case is now handled by the above condition if devices array itself is empty after filtering in App
-            // if (devices.length === 0 && currentRMFilter !== 'all') { 
-            //      return <div className="text-center py-10 text-gray-500 bg-white rounded-lg shadow p-6">Немає приладів для РМ "{currentRMFilter}".</div>;
-            // }
             return (
                 <>
                     <div className="text-sm text-gray-600 text-right mb-2">
@@ -705,9 +698,9 @@
 
         // Main App Component
         function App() {
-            const [allDevices, setAllDevices] = useState([]); // Holds all devices from DB
+            const [allDevices, setAllDevices] = useState([]);
             const [currentRMFilter, setCurrentRMFilter] = useState('all');
-            const [searchTerm, setSearchTerm] = useState(''); // State for search
+            const [searchTerm, setSearchTerm] = useState('');
             const [editingDevice, setEditingDevice] = useState(null);
             const [isModalOpen, setIsModalOpen] = useState(false);
             const [isLoading, setIsLoading] = useState(true);
@@ -746,7 +739,7 @@
                             console.error("Помилка імпорту CSV:", csvError);
                         }
                     }
-                    setAllDevices(currentDevs); // Store all devices here
+                    setAllDevices(currentDevs);
                 } catch (error) {
                     console.error("Failed to load devices:", error);
                     alert("Помилка завантаження приладів. Перевірте консоль.");
@@ -759,16 +752,11 @@
                 loadDevices();
             }, [loadDevices]);
 
-            // Filtered and Sorted Devices Logic
             const filteredAndSortedDevices = useMemo(() => {
                 let devicesToDisplay = [...allDevices];
-
-                // Filter by RM
                 if (currentRMFilter !== 'all') {
                     devicesToDisplay = devicesToDisplay.filter(device => device.rm === currentRMFilter);
                 }
-
-                // Filter by Search Term
                 if (searchTerm.trim() !== '') {
                     const lowerSearchTerm = searchTerm.toLowerCase();
                     devicesToDisplay = devicesToDisplay.filter(device => 
@@ -777,8 +765,6 @@
                         (device.serial && device.serial.toLowerCase().includes(lowerSearchTerm))
                     );
                 }
-
-                // Sort
                 return devicesToDisplay.sort((a, b) => {
                     const statusA = getNextCheckDateStatus(calculateNextCheckDate(a.lastCheckDate, a.mpi));
                     const statusB = getNextCheckDateStatus(calculateNextCheckDate(b.lastCheckDate, b.mpi));
@@ -794,10 +780,8 @@
                 });
             }, [allDevices, currentRMFilter, searchTerm]);
 
-
             const handleRMFILTERChange = (rm) => setCurrentRMFilter(rm);
             const handleSearchChange = (event) => setSearchTerm(event.target.value);
-
             const handleAddDevice = () => {
                 setEditingDevice(null);
                 setIsModalOpen(true);
@@ -842,7 +826,7 @@
             };
 
             const overdueCount = useMemo(() => {
-                return allDevices.filter(device => { // Use allDevices for accurate count
+                return allDevices.filter(device => {
                     const nextCheck = calculateNextCheckDate(device.lastCheckDate, device.mpi);
                     const status = getNextCheckDateStatus(nextCheck);
                     return status.isExpired;
@@ -872,7 +856,7 @@
 
             const handleExportData = async () => {
                 try {
-                    const devicesToExport = await getAllDevicesDB(); // Export all devices
+                    const devicesToExport = await getAllDevicesDB();
                     if (devicesToExport.length === 0) {
                         alert("Немає даних для експорту.");
                         return;
@@ -958,11 +942,10 @@
                             onChange={handleImportData} 
                             className="hidden" 
                         />
-                        <NotificationsArea devices={allDevices} /> {/* Pass allDevices for notifications */}
+                        <NotificationsArea devices={allDevices} />
                         <DeviceList
-                            devices={filteredAndSortedDevices} // Pass the derived list
+                            devices={filteredAndSortedDevices}
                             onEdit={handleEditDevice}
-                            // currentRMFilter is no longer needed here as filtering is done in App
                             onImageClick={handleImageZoom}
                             isLoading={isLoading} 
                         />
