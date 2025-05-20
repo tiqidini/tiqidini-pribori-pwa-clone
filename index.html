@@ -74,7 +74,7 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useCallback, useMemo, useRef } = React; // Added useRef
+        const { useState, useEffect, useCallback, useMemo, useRef } = React;
 
         // --- Database Utilities (db.js) ---
         const DB_NAME = 'priboriReactDB';
@@ -127,7 +127,7 @@
                 }
                 const transaction = db.transaction(STORE_NAME, 'readwrite');
                 const store = transaction.objectStore(STORE_NAME);
-                const request = store.put(device); // put will add or update
+                const request = store.put(device);
                 request.onerror = (event) => reject(`Error saving device: ${event.target.error}`);
                 request.onsuccess = () => resolve();
             });
@@ -145,7 +145,6 @@
             });
         }
         
-        // New DB utility to clear all devices
         async function clearAllDevicesDB() {
             const db = await initDB();
             return new Promise((resolve, reject) => {
@@ -296,37 +295,53 @@
         }
 
         // FilterControls Component
-        function FilterControls({ currentRM, onRMChange, onAddDevice, onExport, onImportTrigger }) { // Added onExport, onImportTrigger
+        function FilterControls({ currentRM, onRMChange, onAddDevice, onExport, onImportTrigger, searchTerm, onSearchChange }) {
             const rms = ["all", "111", "112"];
             return (
-                <div className="my-4 flex flex-wrap gap-4 items-center justify-between">
-                    <div className="flex items-center gap-2 flex-wrap"> {/* Added flex-wrap for smaller screens */}
-                        <span className="text-sm font-medium text-gray-600">РМ:</span>
-                        <div className="inline-flex rounded-md shadow-sm bg-gray-200">
-                            {rms.map(rm => (
-                                <button
-                                    key={rm}
-                                    onClick={() => onRMChange(rm)}
-                                    className={`px-3 py-1.5 text-sm font-medium first:rounded-l-md last:rounded-r-md border border-gray-300 focus:z-10 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors
-                                        ${currentRM === rm ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
-                                >
-                                    {rm === "all" ? "Всі" : rm}
-                                </button>
-                            ))}
+                <div className="my-4 flex flex-col sm:flex-row gap-4 items-center justify-between">
+                    {/* Left side: RM Filter and Search */}
+                    <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-gray-600">РМ:</span>
+                            <div className="inline-flex rounded-md shadow-sm bg-gray-200">
+                                {rms.map(rm => (
+                                    <button
+                                        key={rm}
+                                        onClick={() => onRMChange(rm)}
+                                        className={`px-3 py-1.5 text-sm font-medium first:rounded-l-md last:rounded-r-md border border-gray-300 focus:z-10 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors
+                                            ${currentRM === rm ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
+                                    >
+                                        {rm === "all" ? "Всі" : rm}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="relative flex-grow w-full sm:w-auto sm:ml-4">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i className="fas fa-search text-gray-400"></i>
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Пошук за назвою, типом, S/N..."
+                                value={searchTerm}
+                                onChange={onSearchChange}
+                                className="block w-full pl-10 pr-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            />
                         </div>
                     </div>
-                    <div className="flex gap-2 flex-wrap"> {/* Container for action buttons */}
+                    {/* Right side: Action Buttons */}
+                    <div className="flex gap-2 flex-wrap justify-center sm:justify-end mt-4 sm:mt-0">
                         <button
                             onClick={onExport}
                             className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-3 rounded-md shadow-md hover:shadow-lg transition-all duration-150 ease-in-out flex items-center gap-2 text-sm"
                         >
-                           <i className="fas fa-file-export"></i> Экспорт JSON
+                           <i className="fas fa-file-export"></i> Экспорт
                         </button>
                         <button
                             onClick={onImportTrigger}
                             className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-3 rounded-md shadow-md hover:shadow-lg transition-all duration-150 ease-in-out flex items-center gap-2 text-sm"
                         >
-                           <i className="fas fa-file-import"></i> Импорт JSON
+                           <i className="fas fa-file-import"></i> Импорт
                         </button>
                         <button
                             onClick={onAddDevice}
@@ -373,8 +388,12 @@
         function DeviceCard({ device, onEdit, onImageClick }) {
             const nextCheckStatus = getNextCheckDateStatus(calculateNextCheckDate(device.lastCheckDate, device.mpi));
             const timeline = getTimelineData(device.lastCheckDate, calculateNextCheckDate(device.lastCheckDate, device.mpi), device.mpi);
-            const imageFileName = device.type ? `${device.type.replace(/[\/\s\\?%*:|"<>]/g, '_')}.png` : null;
+            // UPDATED: Added hyphen to the regex for replacement
+            const imageFileName = device.type ? `${device.type.replace(/[\/\s\\?%*:|"<> -]/g, '_')}.png` : null;
             const imageUrl = imageFileName ? `img/${imageFileName}` : null;
+            
+            // console.log(`Device Type: ${device.type}, Attempting to load image: ${imageUrl}`);
+
             const [imageError, setImageError] = useState(false);
 
             useEffect(() => {
@@ -422,7 +441,10 @@
                                             src={imageUrl} 
                                             alt={`Зображення ${device.type}`} 
                                             className="w-full h-full object-contain rounded-md"
-                                            onError={() => setImageError(true)} 
+                                            onError={(e) => {
+                                                // console.error(`Failed to load image for ${device.type}: ${imageUrl}`, e);
+                                                setImageError(true);
+                                            }} 
                                         />
                                     ) : (
                                         <div className="w-full h-full device-image-fallback">
@@ -451,42 +473,27 @@
         }
 
         // DeviceList Component
-        function DeviceList({ devices, onEdit, currentRMFilter, onImageClick, isLoading }) {
-             const filteredDevices = useMemo(() => {
-                const filtered = currentRMFilter === 'all'
-                    ? [...devices]
-                    : devices.filter(device => device.rm === currentRMFilter);
-                return filtered.sort((a, b) => {
-                    const statusA = getNextCheckDateStatus(calculateNextCheckDate(a.lastCheckDate, a.mpi));
-                    const statusB = getNextCheckDateStatus(calculateNextCheckDate(b.lastCheckDate, b.mpi));
-                    if (statusB.sortPriority !== statusA.sortPriority) {
-                        return statusB.sortPriority - statusA.sortPriority;
-                    }
-                    const dateA = statusA.date;
-                    const dateB = statusB.date;
-                    if (dateA && dateB) return dateA.getTime() - dateB.getTime();
-                    if (dateA) return -1;
-                    if (dateB) return 1;
-                    return 0;
-                });
-            }, [devices, currentRMFilter]);
+        function DeviceList({ devices, onEdit, onImageClick, isLoading }) { // Renamed filteredAndSortedDevices to devices
+             // Filtering and sorting logic is now in App component, 
+             // this component just receives the final list to render.
 
             if (isLoading && devices.length === 0) { 
                 return <div className="text-center py-10 text-gray-500 bg-white rounded-lg shadow p-6">Завантаження приладів...</div>;
             }
             if (!isLoading && devices.length === 0) { 
-                 return <div className="text-center py-10 text-gray-500 bg-white rounded-lg shadow p-6">Список приладів порожній.</div>;
+                 return <div className="text-center py-10 text-gray-500 bg-white rounded-lg shadow p-6">Список приладів порожній або не знайдено за фільтрами.</div>;
             }
-            if (filteredDevices.length === 0 && currentRMFilter !== 'all') {
-                 return <div className="text-center py-10 text-gray-500 bg-white rounded-lg shadow p-6">Немає приладів для РМ "{currentRMFilter}".</div>;
-            }
+            // This case is now handled by the above condition if devices array itself is empty after filtering in App
+            // if (devices.length === 0 && currentRMFilter !== 'all') { 
+            //      return <div className="text-center py-10 text-gray-500 bg-white rounded-lg shadow p-6">Немає приладів для РМ "{currentRMFilter}".</div>;
+            // }
             return (
                 <>
                     <div className="text-sm text-gray-600 text-right mb-2">
-                        Показано: {filteredDevices.length} прилад(ів)
+                        Показано: {devices.length} прилад(ів)
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                        {filteredDevices.map(device => (
+                        {devices.map(device => (
                             <DeviceCard key={device.id} device={device} onEdit={onEdit} onImageClick={onImageClick} />
                         ))}
                     </div>
@@ -698,13 +705,14 @@
 
         // Main App Component
         function App() {
-            const [devices, setDevices] = useState([]);
+            const [allDevices, setAllDevices] = useState([]); // Holds all devices from DB
             const [currentRMFilter, setCurrentRMFilter] = useState('all');
+            const [searchTerm, setSearchTerm] = useState(''); // State for search
             const [editingDevice, setEditingDevice] = useState(null);
             const [isModalOpen, setIsModalOpen] = useState(false);
             const [isLoading, setIsLoading] = useState(true);
             const [zoomedImageUrl, setZoomedImageUrl] = useState(null);
-            const fileInputRef = useRef(null); // Ref for file input
+            const fileInputRef = useRef(null);
 
             const loadDevices = useCallback(async () => {
                 setIsLoading(true);
@@ -738,7 +746,7 @@
                             console.error("Помилка імпорту CSV:", csvError);
                         }
                     }
-                    setDevices(currentDevs);
+                    setAllDevices(currentDevs); // Store all devices here
                 } catch (error) {
                     console.error("Failed to load devices:", error);
                     alert("Помилка завантаження приладів. Перевірте консоль.");
@@ -751,7 +759,45 @@
                 loadDevices();
             }, [loadDevices]);
 
+            // Filtered and Sorted Devices Logic
+            const filteredAndSortedDevices = useMemo(() => {
+                let devicesToDisplay = [...allDevices];
+
+                // Filter by RM
+                if (currentRMFilter !== 'all') {
+                    devicesToDisplay = devicesToDisplay.filter(device => device.rm === currentRMFilter);
+                }
+
+                // Filter by Search Term
+                if (searchTerm.trim() !== '') {
+                    const lowerSearchTerm = searchTerm.toLowerCase();
+                    devicesToDisplay = devicesToDisplay.filter(device => 
+                        (device.name && device.name.toLowerCase().includes(lowerSearchTerm)) ||
+                        (device.type && device.type.toLowerCase().includes(lowerSearchTerm)) ||
+                        (device.serial && device.serial.toLowerCase().includes(lowerSearchTerm))
+                    );
+                }
+
+                // Sort
+                return devicesToDisplay.sort((a, b) => {
+                    const statusA = getNextCheckDateStatus(calculateNextCheckDate(a.lastCheckDate, a.mpi));
+                    const statusB = getNextCheckDateStatus(calculateNextCheckDate(b.lastCheckDate, b.mpi));
+                    if (statusB.sortPriority !== statusA.sortPriority) {
+                        return statusB.sortPriority - statusA.sortPriority;
+                    }
+                    const dateA = statusA.date;
+                    const dateB = statusB.date;
+                    if (dateA && dateB) return dateA.getTime() - dateB.getTime();
+                    if (dateA) return -1;
+                    if (dateB) return 1;
+                    return 0;
+                });
+            }, [allDevices, currentRMFilter, searchTerm]);
+
+
             const handleRMFILTERChange = (rm) => setCurrentRMFilter(rm);
+            const handleSearchChange = (event) => setSearchTerm(event.target.value);
+
             const handleAddDevice = () => {
                 setEditingDevice(null);
                 setIsModalOpen(true);
@@ -796,12 +842,12 @@
             };
 
             const overdueCount = useMemo(() => {
-                return devices.filter(device => {
+                return allDevices.filter(device => { // Use allDevices for accurate count
                     const nextCheck = calculateNextCheckDate(device.lastCheckDate, device.mpi);
                     const status = getNextCheckDateStatus(nextCheck);
                     return status.isExpired;
                 }).length;
-            }, [devices]);
+            }, [allDevices]);
 
             useEffect(() => {
                 if ('setAppBadge' in navigator) {
@@ -814,8 +860,6 @@
                             console.error("Error clearing app badge:", error);
                         });
                     }
-                } else {
-                    console.log("Badging API is not supported in this browser.");
                 }
             }, [overdueCount]);
 
@@ -826,15 +870,14 @@
                 setZoomedImageUrl(null);
             };
 
-            // Export Data Function
             const handleExportData = async () => {
                 try {
-                    const allDevices = await getAllDevicesDB();
-                    if (allDevices.length === 0) {
+                    const devicesToExport = await getAllDevicesDB(); // Export all devices
+                    if (devicesToExport.length === 0) {
                         alert("Немає даних для експорту.");
                         return;
                     }
-                    const jsonData = JSON.stringify(allDevices, null, 2); // Pretty print JSON
+                    const jsonData = JSON.stringify(devicesToExport, null, 2);
                     const blob = new Blob([jsonData], { type: 'application/json' });
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
@@ -851,17 +894,15 @@
                 }
             };
 
-            // Import Data Function
             const handleImportData = async (event) => {
                 const file = event.target.files[0];
                 if (!file) {
                     return;
                 }
                 if (!window.confirm("УВАГА! Імпорт замінить усі поточні дані. Ви впевнені, що хочете продовжити?")) {
-                    if(fileInputRef.current) fileInputRef.current.value = ""; // Reset file input
+                    if(fileInputRef.current) fileInputRef.current.value = "";
                     return;
                 }
-
                 const reader = new FileReader();
                 reader.onload = async (e) => {
                     try {
@@ -869,27 +910,23 @@
                         if (!Array.isArray(importedDevices)) {
                             throw new Error("Формат файлу невірний. Очікується масив приладів.");
                         }
-                        
-                        // Validate basic structure of imported devices (optional but recommended)
                         for(const device of importedDevices){
                             if(typeof device.id === 'undefined' || !device.name || !device.type || !device.serial){
                                 throw new Error(`Невірний формат об'єкта приладу в файлі: ${JSON.stringify(device)}`);
                             }
-                            // Ensure nextCheckDate is recalculated or validated if present
                             device.nextCheckDate = calculateNextCheckDate(device.lastCheckDate, device.mpi);
                         }
-
-                        await clearAllDevicesDB(); // Clear existing data
+                        await clearAllDevicesDB();
                         for (const device of importedDevices) {
-                            await saveDeviceDB(device); // Save imported devices
+                            await saveDeviceDB(device);
                         }
-                        await loadDevices(); // Reload and update UI
+                        await loadDevices();
                         alert(`Дані успішно імпортовано. Завантажено ${importedDevices.length} прилад(ів).`);
                     } catch (error) {
                         console.error("Error importing data:", error);
                         alert(`Помилка імпорту даних: ${error.message}`);
                     } finally {
-                         if(fileInputRef.current) fileInputRef.current.value = ""; // Reset file input
+                         if(fileInputRef.current) fileInputRef.current.value = "";
                     }
                 };
                 reader.readAsText(file);
@@ -901,7 +938,6 @@
                 }
             };
 
-
             return (
                 <div className="min-h-screen bg-gray-100">
                     <Header overdueCount={overdueCount} />
@@ -909,6 +945,8 @@
                         <FilterControls
                             currentRM={currentRMFilter}
                             onRMChange={handleRMFILTERChange}
+                            searchTerm={searchTerm}
+                            onSearchChange={handleSearchChange}
                             onAddDevice={handleAddDevice}
                             onExport={handleExportData}
                             onImportTrigger={triggerImportFileSelect}
@@ -920,11 +958,11 @@
                             onChange={handleImportData} 
                             className="hidden" 
                         />
-                        <NotificationsArea devices={devices} />
+                        <NotificationsArea devices={allDevices} /> {/* Pass allDevices for notifications */}
                         <DeviceList
-                            devices={devices}
+                            devices={filteredAndSortedDevices} // Pass the derived list
                             onEdit={handleEditDevice}
-                            currentRMFilter={currentRMFilter}
+                            // currentRMFilter is no longer needed here as filtering is done in App
                             onImageClick={handleImageZoom}
                             isLoading={isLoading} 
                         />
@@ -953,10 +991,8 @@
         if ('serviceWorker' in navigator) {
             const swPath = 'service-worker.js'; 
             const swScope = './'; 
-            console.log(`Registering Service Worker at: ${swPath} with scope: ${swScope}`);
             navigator.serviceWorker.register(swPath, { scope: swScope })
             .then(registration => {
-                console.log('Service Worker зареєстровано:', registration.scope);
                 registration.onupdatefound = () => {
                     const installingWorker = registration.installing;
                     if (installingWorker) {
