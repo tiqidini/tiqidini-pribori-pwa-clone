@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="uk">
 <head>
@@ -299,8 +300,8 @@
             const rms = ["all", "111", "112"];
             return (
                 <div className="my-4 flex flex-col md:flex-row gap-4 items-center justify-between">
-                    {/* Left side: RM Filter and Search - now in one row for medium screens and up */}
-                    <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
+                    {/* Left side: RM Filter and Search */}
+                    <div className="flex flex-row flex-wrap items-center gap-3 w-full md:flex-nowrap lg:w-auto">
                         <div className="flex items-center gap-2">
                             <span className="text-sm font-medium text-gray-600">РМ:</span>
                             <div className="inline-flex rounded-md shadow-sm bg-gray-200">
@@ -316,7 +317,7 @@
                                 ))}
                             </div>
                         </div>
-                        <div className="relative flex-grow w-full sm:w-auto">
+                        <div className="relative flex-1 min-w-0">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <i className="fas fa-search text-gray-400"></i>
                             </div>
@@ -329,7 +330,7 @@
                             />
                         </div>
                     </div>
-                    {/* Right side: Action Buttons - now in one row for medium screens and up */}
+                    {/* Right side: Action Buttons */}
                     <div className="flex items-center gap-2 flex-wrap justify-center md:justify-end mt-4 md:mt-0 w-full md:w-auto">
                         <button
                             onClick={onExport}
