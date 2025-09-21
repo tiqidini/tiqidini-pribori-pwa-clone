@@ -1,0 +1,45 @@
+{
+  "name": "Список Приладів (React)",
+  "short_name": "Прилади React",
+  "description": "Додаток для обліку вимірювальних приладів, їх повірок та калібрувань (React версія)",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#f0f4f8",
+  "theme_color": "#3a86ff",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "img/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "img/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "img/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "img/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "img/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png"
+    },
+    {
+      "src": "img/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
