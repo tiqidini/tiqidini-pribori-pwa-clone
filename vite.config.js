@@ -5,4 +5,8 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   base: '/tiqidini-pribori-pwa-clone/',
   plugins: [react()],
+  build: {
+    outDir: 'dist',
+    manifest: true,
+  },
 })
