@@ -20,7 +20,7 @@
   "bugs": {
     "url": "https://github.com/tiqidini/pribori-pwa/issues"
   },
-  "homepage": "https://tiqidini.github.io/pribori-pwa-clone",
+  "homepage": "https://tiqidini.github.io/tiqidini-pribori-pwa-clone",
   "devDependencies": {
     "@vitejs/plugin-react": "^5.0.3",
     "autoprefixer": "^10.4.21",
